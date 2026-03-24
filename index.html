@@ -9,14 +9,13 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
   .app { display: flex; min-height: 100vh; }
-  .sidebar { width: 220px; background: #ffffff; border-right: 1px solid #e8e8e4; padding: 20px 14px; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; }
+  .sidebar { width: 220px; background: #fff; border-right: 1px solid #e8e8e4; padding: 20px 14px; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; }
   .main { margin-left: 220px; padding: 24px; flex: 1; }
   .sidebar-logo { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 24px; padding: 4px 10px; }
   .nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: #666; margin-bottom: 4px; transition: background 0.15s; }
   .nav-item.active { background: #f0f0ea; color: #1a1a1a; font-weight: 500; }
   .nav-item:hover { background: #f0f0ea; }
   .separator { height: 1px; background: #e8e8e4; margin: 10px 0; }
-  .conn-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 10px; margin-bottom: 6px; }
   .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .header h1 { font-size: 20px; font-weight: 600; }
   .btn-primary { background: #1a1a1a; color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 500; }
@@ -28,13 +27,13 @@
   .filters { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
   .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid #ddd; background: #fff; font-size: 12px; cursor: pointer; color: #666; transition: all 0.15s; }
   .filter-btn.active { background: #1a1a1a; color: #fff; border-color: transparent; }
-  .task-card { background: #fff; border: 1px solid #e8e8e4; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.15s; }
+  .task-card { background: #fff; border: 1px solid #e8e8e4; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; transition: border-color 0.15s; }
   .task-card:hover { border-color: #ccc; }
   .task-card.expanded { border-color: #999; }
   .task-top { display: flex; align-items: flex-start; gap: 10px; }
   .task-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd; flex-shrink: 0; margin-top: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all 0.15s; }
   .task-check.done { background: #639922; border-color: #639922; color: white; }
-  .task-info { flex: 1; }
+  .task-info { flex: 1; cursor: pointer; }
   .task-title { font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 5px; }
   .task-title.done { text-decoration: line-through; color: #aaa; }
   .task-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -53,6 +52,8 @@
   .task-detail.show { display: block; }
   .detail-label { font-size: 11px; color: #aaa; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
   .detail-note { font-size: 13px; color: #666; background: #f8f8f4; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; line-height: 1.6; }
+  .ai-loading { font-size: 12px; color: #3C3489; margin-bottom: 8px; display: none; }
+  .ai-result { font-size: 13px; color: #1a1a1a; background: #EEEDFE; border: 1px solid #AFA9EC; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; line-height: 1.6; display: none; }
   .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .meeting-card { background: #fff; border: 1px solid #e8e8e4; border-radius: 12px; padding: 16px; margin-bottom: 10px; }
   .meeting-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
@@ -70,16 +71,18 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
   .btn-cancel { padding: 9px 18px; border: 1px solid #ddd; border-radius: 8px; background: none; font-size: 13px; cursor: pointer; color: #888; }
+  .tg-info { background: #E6F1FB; border: 1px solid #85B7EB; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #185FA5; margin-bottom: 16px; line-height: 1.7; }
+  .tg-info code { background: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; word-break: break-all; display: block; margin-top: 4px; }
+  .msg-preview { font-size: 12px; color: #666; background: #f8f8f4; padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; line-height: 1.6; white-space: pre-wrap; display: none; }
   .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; color: #fff; padding: 11px 18px; border-radius: 9px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.25s; pointer-events: none; }
   .toast.show { opacity: 1; }
-  .loading { text-align: center; padding: 50px; color: #aaa; font-size: 13px; }
   .empty { text-align: center; padding: 50px; color: #aaa; font-size: 13px; }
   @media (max-width: 700px) {
     .sidebar { width: 100%; position: relative; height: auto; border-right: none; border-bottom: 1px solid #e8e8e4; }
-    .main { margin-left: 0; }
+    .main { margin-left: 0; padding: 16px; }
     .app { flex-direction: column; }
     .stat-row { grid-template-columns: repeat(2, 1fr); }
-    .task-actions { flex-direction: column; }
+    .task-actions { flex-wrap: wrap; }
   }
 </style>
 </head>
@@ -90,7 +93,7 @@
     <div class="nav-item active" id="nav-tasks" onclick="showView('tasks')">📋 Görevler</div>
     <div class="nav-item" id="nav-meetings" onclick="showView('meetings')">📝 Toplantılar</div>
     <div class="separator"></div>
-    <div class="conn-label">Bağlantı</div>
+    <div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;padding:0 10px;margin-bottom:6px;">Bağlantı</div>
     <div id="conn-status" style="font-size:12px;color:#aaa;padding:0 10px;">Bağlanıyor...</div>
   </div>
 
@@ -114,7 +117,7 @@
         <button class="filter-btn" onclick="setFilter('active',this)">Devam edenler</button>
         <button class="filter-btn" onclick="setFilter('done',this)">Tamamlananlar</button>
       </div>
-      <div id="task-list"><div class="loading">Yükleniyor...</div></div>
+      <div id="task-list"><div class="empty">Yükleniyor...</div></div>
     </div>
 
     <div id="view-meetings" style="display:none;">
@@ -122,7 +125,7 @@
         <h1>Toplantı Notları</h1>
         <button class="btn-primary" onclick="openModal('meetingModal')">+ Yeni Toplantı</button>
       </div>
-      <div id="meeting-list"><div class="loading">Yükleniyor...</div></div>
+      <div id="meeting-list"><div class="empty">Yükleniyor...</div></div>
     </div>
   </div>
 </div>
@@ -166,15 +169,38 @@
   </div>
 </div>
 
+<!-- Telegram Modal -->
+<div class="modal-overlay" id="tgModal">
+  <div class="modal">
+    <h2>✈ Telegram'a Gönder</h2>
+    <div class="tg-info">
+      Mesajı kendi telefonunuza göndermek için Chat ID'nizi girin.<br><br>
+      <b>Chat ID nasıl öğrenilir?</b><br>
+      1. Telegram'da botunuzu arayın ve <b>/start</b> yazın<br>
+      2. Tarayıcıda şu adrese gidin:<br>
+      <code>https://api.telegram.org/bot8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs/getUpdates</code>
+      Çıkan sayfada <b>"id"</b> yazan sayıyı kopyalayın.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Telegram Chat ID</label>
+      <input class="form-input" id="tg-chat-input" placeholder="Örn: 933023424" />
+    </div>
+    <div class="msg-preview" id="tg-msg-preview"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('tgModal')">İptal</button>
+      <button class="btn-primary" onclick="confirmSendTelegram()">Gönder</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 const SUPABASE_URL = 'https://cvgxwpxvtxedajzrnand.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_cJp6p5cSfJwOynI5kCK_2Q_EPP4bijp';
 const TG_TOKEN = '8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs';
-const TG_CHAT_ID = '933023424';
 
-let sb, tasks = [], meetings = [], currentFilter = 'all', expandedId = null;
+let sb, tasks = [], meetings = [], currentFilter = 'all', expandedId = null, pendingTgMsg = null;
 
 async function init() {
   try {
@@ -182,43 +208,36 @@ async function init() {
     const { error } = await sb.from('tasks').select('id').limit(1);
     if (error) throw error;
     document.getElementById('conn-status').innerHTML = '<span style="color:#3B6D11;">● Bağlandı</span>';
-    await loadTasks();
-    await loadMeetings();
+    await loadTasks(); await loadMeetings();
   } catch(e) {
-    document.getElementById('conn-status').innerHTML = '<span style="color:#A32D2D;">● Hata</span>';
-    document.getElementById('task-list').innerHTML = '<div class="empty">Bağlantı hatası. Konsolu kontrol et.</div>';
+    document.getElementById('conn-status').innerHTML = '<span style="color:#A32D2D;">● Bağlantı hatası</span>';
+    document.getElementById('task-list').innerHTML = '<div class="empty">Veritabanına bağlanılamadı.</div>';
   }
 }
 
 async function loadTasks() {
   const { data } = await sb.from('tasks').select('*').order('created_at', { ascending: false });
-  tasks = data || [];
-  renderTasks();
+  tasks = data || []; renderTasks();
 }
-
 async function loadMeetings() {
   const { data } = await sb.from('meetings').select('*').order('created_at', { ascending: false });
-  meetings = data || [];
-  renderMeetings();
+  meetings = data || []; renderMeetings();
 }
 
 function dayDiff(ds) {
   if (!ds) return 999;
-  const d = new Date(ds); const n = new Date(); n.setHours(0,0,0,0);
+  const d = new Date(ds), n = new Date(); n.setHours(0,0,0,0);
   return Math.ceil((d - n) / 86400000);
 }
-
 function fmtDate(ds) {
   if (!ds) return '';
   return new Date(ds).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
 }
-
 function priorityBadge(p) {
-  if (p === 'acil') return '<span class="badge badge-red">Acil</span>';
-  if (p === 'orta') return '<span class="badge badge-amber">Orta</span>';
+  if (p==='acil') return '<span class="badge badge-red">Acil</span>';
+  if (p==='orta') return '<span class="badge badge-amber">Orta</span>';
   return '<span class="badge badge-green">Düşük</span>';
 }
-
 function deadlineLabel(dl, done) {
   if (done || !dl) return '';
   const d = dayDiff(dl);
@@ -229,38 +248,36 @@ function deadlineLabel(dl, done) {
 
 function renderTasks() {
   const filtered = tasks.filter(t => {
-    if (currentFilter === 'done') return t.done;
-    if (currentFilter === 'active') return !t.done;
-    if (currentFilter === 'acil') return t.priority === 'acil' && !t.done;
-    if (currentFilter === 'orta') return t.priority === 'orta' && !t.done;
-    if (currentFilter === 'dusuk') return t.priority === 'dusuk' && !t.done;
+    if (currentFilter==='done') return t.done;
+    if (currentFilter==='active') return !t.done;
+    if (['acil','orta','dusuk'].includes(currentFilter)) return t.priority===currentFilter && !t.done;
     return true;
   });
   document.getElementById('s-total').textContent = tasks.length;
-  document.getElementById('s-active').textContent = tasks.filter(t => !t.done).length;
-  document.getElementById('s-done').textContent = tasks.filter(t => t.done).length;
-  document.getElementById('s-urgent').textContent = tasks.filter(t => !t.done && dayDiff(t.deadline) <= 3).length;
+  document.getElementById('s-active').textContent = tasks.filter(t=>!t.done).length;
+  document.getElementById('s-done').textContent = tasks.filter(t=>t.done).length;
+  document.getElementById('s-urgent').textContent = tasks.filter(t=>!t.done && dayDiff(t.deadline)<=3).length;
 
-  if (filtered.length === 0) {
-    document.getElementById('task-list').innerHTML = '<div class="empty">Görev bulunamadı</div>';
-    return;
-  }
+  if (!filtered.length) { document.getElementById('task-list').innerHTML='<div class="empty">Görev bulunamadı</div>'; return; }
+
   document.getElementById('task-list').innerHTML = filtered.map(t => `
-    <div class="task-card ${expandedId === t.id ? 'expanded' : ''}">
+    <div class="task-card ${expandedId===t.id?'expanded':''}">
       <div class="task-top">
-        <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleDone('${t.id}','${t.done}')">${t.done ? '✓' : ''}</div>
+        <div class="task-check ${t.done?'done':''}" onclick="toggleDone('${t.id}','${t.done}')">${t.done?'✓':''}</div>
         <div class="task-info" onclick="toggleExpand('${t.id}')">
-          <div class="task-title ${t.done ? 'done' : ''}">${t.title}</div>
-          <div class="task-meta">${priorityBadge(t.priority)}${deadlineLabel(t.deadline, t.done)}${t.done ? '<span class="badge badge-green">Tamamlandı</span>' : ''}</div>
+          <div class="task-title ${t.done?'done':''}">${t.title}</div>
+          <div class="task-meta">${priorityBadge(t.priority)}${deadlineLabel(t.deadline,t.done)}${t.done?'<span class="badge badge-green">Tamamlandı</span>':''}</div>
         </div>
         <div class="task-actions">
-          <button class="icon-btn ai-btn" onclick="aiAlert('${t.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">✦ Araştır</button>
-          <button class="icon-btn tg-btn" onclick="sendTelegram('${t.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${t.deadline}','${t.priority}')">✈ Telegram</button>
+          <button class="icon-btn ai-btn" onclick="aiResearch('${t.id}','${t.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">✦ Araştır</button>
+          <button class="icon-btn tg-btn" onclick="prepareTg('gorev','${t.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${t.deadline}','${t.priority}')">✈ Telegram</button>
         </div>
       </div>
-      <div class="task-detail ${expandedId === t.id ? 'show' : ''}">
+      <div class="task-detail ${expandedId===t.id?'show':''}">
+        <div class="ai-loading" id="ai-load-${t.id}">✦ AI araştırıyor...</div>
+        <div class="ai-result" id="ai-res-${t.id}"></div>
         <div class="detail-label">Son durum notu</div>
-        <div class="detail-note">${t.note || 'Henüz not eklenmedi.'}</div>
+        <div class="detail-note">${t.note||'Henüz not eklenmedi.'}</div>
         <div class="detail-actions">
           <button class="icon-btn" onclick="editNote('${t.id}','${(t.note||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">✏ Notu düzenle</button>
           <button class="icon-btn" style="color:#A32D2D;" onclick="deleteTask('${t.id}')">✕ Sil</button>
@@ -271,20 +288,17 @@ function renderTasks() {
 }
 
 function renderMeetings() {
-  if (meetings.length === 0) {
-    document.getElementById('meeting-list').innerHTML = '<div class="empty">Henüz toplantı notu yok</div>';
-    return;
-  }
-  document.getElementById('meeting-list').innerHTML = meetings.map(m => `
+  if (!meetings.length) { document.getElementById('meeting-list').innerHTML='<div class="empty">Henüz toplantı notu yok</div>'; return; }
+  document.getElementById('meeting-list').innerHTML = meetings.map(m=>`
     <div class="meeting-card">
       <div class="meeting-top">
         <div style="flex:1;">
           <div class="meeting-title">${m.title}</div>
-          <div class="meeting-meta">📅 ${fmtDate(m.meeting_date)} · 👥 ${m.people || ''}</div>
-          <div class="meeting-note">${m.note || ''}</div>
+          <div class="meeting-meta">📅 ${fmtDate(m.meeting_date)} · 👥 ${m.people||''}</div>
+          <div class="meeting-note">${m.note||''}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-          <button class="icon-btn tg-btn" onclick="sendMeetingTelegram('${m.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${(m.note||'').replace(/'/g,"\\'").replace(/\n/g,' ').replace(/"/g,'&quot;')}','${m.meeting_date}','${(m.people||'').replace(/'/g,"\\'")}')">✈ Telegram</button>
+          <button class="icon-btn tg-btn" onclick="prepareTg('toplanti','${m.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${m.meeting_date}','','${(m.note||'').replace(/'/g,"\\'").replace(/\n/g,' ').replace(/"/g,'&quot;')}','${(m.people||'').replace(/'/g,"\\'")}')">✈ Telegram</button>
           <button class="icon-btn" style="color:#A32D2D;" onclick="deleteMeeting('${m.id}')">✕ Sil</button>
         </div>
       </div>
@@ -292,138 +306,125 @@ function renderMeetings() {
   `).join('');
 }
 
-function toggleExpand(id) {
-  expandedId = expandedId === id ? null : id;
-  renderTasks();
-}
-
-async function toggleDone(id, currentDone) {
-  const newDone = currentDone === 'true' ? false : true;
-  await sb.from('tasks').update({ done: newDone }).eq('id', id);
-  await loadTasks();
-}
-
-async function addTask() {
-  const title = document.getElementById('f-title').value.trim();
-  if (!title) { alert('Görev başlığı gerekli!'); return; }
-  await sb.from('tasks').insert({
-    title,
-    start_date: document.getElementById('f-start').value || null,
-    deadline: document.getElementById('f-deadline').value || null,
-    priority: document.getElementById('f-priority').value,
-    note: document.getElementById('f-note').value,
-    done: false
-  });
-  closeModal('taskModal');
-  document.getElementById('f-title').value = '';
-  document.getElementById('f-note').value = '';
-  showToast('Görev eklendi ✓');
-  await loadTasks();
-}
-
-async function addMeeting() {
-  const title = document.getElementById('m-title').value.trim();
-  if (!title) { alert('Toplantı başlığı gerekli!'); return; }
-  await sb.from('meetings').insert({
-    title,
-    meeting_date: document.getElementById('m-date').value || null,
-    people: document.getElementById('m-people').value,
-    note: document.getElementById('m-note').value
-  });
-  closeModal('meetingModal');
-  document.getElementById('m-title').value = '';
-  document.getElementById('m-note').value = '';
-  showToast('Toplantı notu kaydedildi ✓');
-  await loadMeetings();
-}
-
-async function editNote(id, currentNote) {
-  const newNote = prompt('Notu güncelle:', currentNote);
-  if (newNote !== null) {
-    await sb.from('tasks').update({ note: newNote }).eq('id', id);
-    showToast('Not güncellendi ✓');
-    await loadTasks();
+async function aiResearch(taskId, title) {
+  const loadEl = document.getElementById('ai-load-'+taskId);
+  const resEl = document.getElementById('ai-res-'+taskId);
+  if (!loadEl || !resEl) return;
+  loadEl.style.display = 'block';
+  resEl.style.display = 'none';
+  resEl.innerHTML = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: `Bu iş görevi hakkında Türkçe kısa bir özet yaz ve ne yapılması gerektiğine dair 3-4 madde halinde pratik öneriler sun. Görev: "${title}". Yanıtın toplam 150 kelimeyi geçmesin.` }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(c=>c.text||'').join('') || 'Sonuç alınamadı.';
+    loadEl.style.display = 'none';
+    resEl.innerHTML = text.replace(/\n/g,'<br>');
+    resEl.style.display = 'block';
+  } catch(e) {
+    loadEl.style.display = 'none';
+    resEl.textContent = 'AI bağlantı hatası. Lütfen tekrar deneyin.';
+    resEl.style.display = 'block';
   }
 }
 
-async function deleteTask(id) {
-  if (!confirm('Bu görevi silmek istediğine emin misin?')) return;
-  await sb.from('tasks').delete().eq('id', id);
-  expandedId = null;
-  showToast('Görev silindi');
-  await loadTasks();
+function prepareTg(type, title, date, priority, note='', people='') {
+  let msg = '';
+  if (type === 'gorev') {
+    const d = dayDiff(date);
+    const prioLabel = priority==='acil'?'🔴 Acil':priority==='orta'?'🟡 Orta':'🟢 Düşük';
+    let dlText = date ? `\n📅 Deadline: ${fmtDate(date)}` : '';
+    if (date && d<=3 && d>=0) dlText += ` (⏰ ${d} gün kaldı!)`;
+    if (date && d<0) dlText += ` (⚠ ${Math.abs(d)} gün geçti!)`;
+    msg = `📋 Görev Hatırlatması\n\n${title}\n${prioLabel}${dlText}`;
+  } else {
+    msg = `📝 Toplantı Notu\n\n${title}\n📅 ${fmtDate(date)}\n👥 ${people}\n\n${note}`;
+  }
+  pendingTgMsg = msg;
+  const preview = document.getElementById('tg-msg-preview');
+  preview.textContent = msg;
+  preview.style.display = 'block';
+  const saved = localStorage.getItem('tg_chat_id');
+  if (saved) document.getElementById('tg-chat-input').value = saved;
+  openModal('tgModal');
 }
 
-async function deleteMeeting(id) {
-  if (!confirm('Bu toplantı notunu silmek istediğine emin misin?')) return;
-  await sb.from('meetings').delete().eq('id', id);
-  showToast('Toplantı notu silindi');
-  await loadMeetings();
-}
-
-async function sendTelegramMsg(text) {
+async function confirmSendTelegram() {
+  const chatId = document.getElementById('tg-chat-input').value.trim();
+  if (!chatId) { showToast('Chat ID gerekli!'); return; }
+  localStorage.setItem('tg_chat_id', chatId);
   try {
     const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: TG_CHAT_ID, text, parse_mode: 'HTML' })
+      body: JSON.stringify({ chat_id: chatId, text: pendingTgMsg })
     });
     const data = await res.json();
-    if (data.ok) showToast('Telegram\'a gönderildi ✓');
-    else showToast('Telegram hatası');
-  } catch(e) { showToast('Telegram bağlantı hatası'); }
+    if (data.ok) { showToast("Telegram'a gönderildi ✓"); closeModal('tgModal'); }
+    else showToast('Hata: ' + (data.description||'Bilinmeyen hata'));
+  } catch(e) { showToast('Bağlantı hatası. Tekrar deneyin.'); }
 }
 
-function sendTelegram(title, deadline, priority) {
-  const d = dayDiff(deadline);
-  const prioLabel = priority === 'acil' ? '🔴 Acil' : priority === 'orta' ? '🟡 Orta' : '🟢 Düşük';
-  let dlText = deadline ? `\n📅 Deadline: ${fmtDate(deadline)}` : '';
-  if (deadline && d <= 3 && d >= 0) dlText += ` <b>(⏰ ${d} gün kaldı!)</b>`;
-  if (deadline && d < 0) dlText += ` <b>(⚠ ${Math.abs(d)} gün geçti!)</b>`;
-  sendTelegramMsg(`📋 <b>Görev Hatırlatması</b>\n\n<b>${title}</b>\n${prioLabel}${dlText}`);
+function toggleExpand(id) { expandedId = expandedId===id?null:id; renderTasks(); }
+async function toggleDone(id, cur) {
+  await sb.from('tasks').update({ done: cur==='true'?false:true }).eq('id',id);
+  await loadTasks();
 }
-
-function sendMeetingTelegram(title, note, date, people) {
-  sendTelegramMsg(`📝 <b>Toplantı Notu</b>\n\n<b>${title}</b>\n📅 ${fmtDate(date)}\n👥 ${people}\n\n${note}`);
+async function addTask() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { alert('Görev başlığı gerekli!'); return; }
+  await sb.from('tasks').insert({ title, start_date: document.getElementById('f-start').value||null, deadline: document.getElementById('f-deadline').value||null, priority: document.getElementById('f-priority').value, note: document.getElementById('f-note').value, done: false });
+  closeModal('taskModal');
+  document.getElementById('f-title').value=''; document.getElementById('f-note').value='';
+  showToast('Görev eklendi ✓'); await loadTasks();
 }
-
-function aiAlert(title) {
-  alert('AI Araştır: Bu özellik Claude.ai üzerinde çalışmaktadır. Görev: "' + title + '" hakkında Claude\'a sormak için claude.ai adresini ziyaret edin.');
+async function addMeeting() {
+  const title = document.getElementById('m-title').value.trim();
+  if (!title) { alert('Toplantı başlığı gerekli!'); return; }
+  await sb.from('meetings').insert({ title, meeting_date: document.getElementById('m-date').value||null, people: document.getElementById('m-people').value, note: document.getElementById('m-note').value });
+  closeModal('meetingModal');
+  document.getElementById('m-title').value=''; document.getElementById('m-note').value='';
+  showToast('Kaydedildi ✓'); await loadMeetings();
 }
-
+async function editNote(id, cur) {
+  const n = prompt('Notu güncelle:', cur);
+  if (n!==null) { await sb.from('tasks').update({note:n}).eq('id',id); showToast('Güncellendi ✓'); await loadTasks(); }
+}
+async function deleteTask(id) {
+  if (!confirm('Bu görevi silmek istediğine emin misin?')) return;
+  await sb.from('tasks').delete().eq('id',id); expandedId=null; showToast('Silindi'); await loadTasks();
+}
+async function deleteMeeting(id) {
+  if (!confirm('Bu toplantı notunu silmek istediğine emin misin?')) return;
+  await sb.from('meetings').delete().eq('id',id); showToast('Silindi'); await loadMeetings();
+}
 function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTasks();
+  currentFilter=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderTasks();
 }
-
 function showView(v) {
-  document.getElementById('view-tasks').style.display = v === 'tasks' ? 'block' : 'none';
-  document.getElementById('view-meetings').style.display = v === 'meetings' ? 'block' : 'none';
-  document.getElementById('nav-tasks').classList.toggle('active', v === 'tasks');
-  document.getElementById('nav-meetings').classList.toggle('active', v === 'meetings');
+  document.getElementById('view-tasks').style.display=v==='tasks'?'block':'none';
+  document.getElementById('view-meetings').style.display=v==='meetings'?'block':'none';
+  document.getElementById('nav-tasks').classList.toggle('active',v==='tasks');
+  document.getElementById('nav-meetings').classList.toggle('active',v==='meetings');
 }
-
 function openModal(id) {
   document.getElementById(id).classList.add('show');
-  const today = new Date().toISOString().split('T')[0];
-  if (id === 'taskModal') {
-    document.getElementById('f-start').value = today;
-    document.getElementById('f-deadline').value = today;
-  }
-  if (id === 'meetingModal') document.getElementById('m-date').value = today;
+  const today=new Date().toISOString().split('T')[0];
+  if(id==='taskModal'){document.getElementById('f-start').value=today;document.getElementById('f-deadline').value=today;}
+  if(id==='meetingModal') document.getElementById('m-date').value=today;
 }
-
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
-
 init();
 </script>
 </body>

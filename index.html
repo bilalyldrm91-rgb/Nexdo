@@ -307,8 +307,8 @@ function renderMeetings() {
 }
 
 async function aiResearch(taskId, title) {
-  const loadEl = document.getElementById('ai-load-'+taskId);
-  const resEl = document.getElementById('ai-res-'+taskId);
+  const loadEl = document.getElementById('ai-load-' + taskId);
+  const resEl = document.getElementById('ai-res-' + taskId);
   if (!loadEl || !resEl) return;
 
   loadEl.style.display = 'block';
@@ -317,20 +317,28 @@ async function aiResearch(taskId, title) {
 
   try {
     const res = await fetch('/api/ai', {
-      method: 'POST',
+      method: 'POST',             // Sadece POST ile çağırıyoruz
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: `Bu görev için Türkçe kısa özet ve 3-4 maddelik yapılacaklar: "${title}"` })
+      body: JSON.stringify({
+        prompt: `Bu görev için Türkçe kısa özet ve 3-4 maddelik yapılacaklar: "${title}"`
+      })
     });
 
+    // Eğer sunucu 200 dönmezse hata fırlat
+    if (!res.ok) throw new Error(`Sunucu hatası: ${res.status}`);
+
     const data = await res.json();
+    const text = data.result || 'Sonuç alınamadı.';
+
     loadEl.style.display = 'none';
-    resEl.innerHTML = data.text.replace(/\n/g,'<br>');
+    resEl.innerHTML = text.replace(/\n/g, '<br>');
     resEl.style.display = 'block';
 
-  } catch(e) {
+  } catch (e) {
     loadEl.style.display = 'none';
     resEl.textContent = 'AI bağlantı hatası. Lütfen tekrar deneyin.';
     resEl.style.display = 'block';
+    console.error(e);
   }
 }
 

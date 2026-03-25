@@ -1,61 +1,20 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>İş Takip</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-body{font-family:sans-serif;background:#f5f5f0}
-.auth-wrap{display:flex;align-items:center;justify-content:center;height:100vh}
-.auth-box{background:#fff;padding:30px;border-radius:10px;width:320px}
-.btn{padding:10px;width:100%;margin-top:10px;cursor:pointer}
-</style>
-</head>
-
-<body>
-
-<!-- AUTH -->
-<div id="auth-screen" class="auth-wrap">
-  <div class="auth-box">
-    <h3>Giriş</h3>
-    <input id="l-email" placeholder="email" /><br><br>
-    <input id="l-pass" type="password" placeholder="şifre"/><br>
-    <label><input type="checkbox" id="remember-me"> Beni hatırla</label>
-    <button class="btn" onclick="doLogin()">Giriş Yap</button>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app-screen" style="display:none;padding:20px;">
-  <h2>Görevler</h2>
-
-  <input id="f-title" placeholder="Yeni görev"/>
-  <button onclick="addTask()">Ekle</button>
-
-  <div id="task-list"></div>
-
-  <h2>Kullanıcılar</h2>
-  <div id="user-list"></div>
-
-  <h2>Ekipler</h2>
-  <div id="team-list"></div>
-
-  <button onclick="doLogout()">Çıkış</button>
-</div>
-
 <script>
 const SB_URL='https://cvgxwpxvtxedajzrnand.supabase.co';
 const SB_KEY='sb_publishable_cJp6p5cSfJwOynI5kCK_2Q_EPP4bijp';
+const TG_TOKEN='8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs';
 
 let sb,me=null,myProfile=null;
 let tasks=[],profiles=[],teams=[];
+let onlineUsers=new Map();
 
 // INIT
 async function init(){
-  sb=supabase.createClient(SB_URL,SB_KEY);
+  if(!window.supabase){
+    alert("Supabase yüklenmedi");
+    return;
+  }
+
+  sb=window.supabase.createClient(SB_URL,SB_KEY);
 
   const remember = localStorage.getItem("remember_me");
 
@@ -83,7 +42,8 @@ async function doLogin(){
   const email=document.getElementById('l-email').value.trim();
   const pass=document.getElementById('l-pass').value;
 
-  const remember=document.getElementById('remember-me').checked;
+  const rememberEl=document.getElementById('remember-me');
+  const remember=rememberEl ? rememberEl.checked : false;
 
   if(remember) localStorage.setItem('remember_me','1');
   else localStorage.removeItem('remember_me');
@@ -100,15 +60,21 @@ async function doLogout(){
   location.reload();
 }
 
-// SHOW APP
+// APP LOAD
 async function showApp(){
   document.getElementById('auth-screen').style.display='none';
-  document.getElementById('app-screen').style.display='block';
+  document.getElementById('app-screen').style.display='flex';
 
   const {data}=await sb.from('profiles').select('*').eq('id',me.id).single();
   myProfile=data;
 
+  // ONLINE YAP
   await sb.from('profiles').update({status:'online'}).eq('id',me.id);
+
+  // ROLE CONTROL
+  if(myProfile.role!=='admin'){
+    document.getElementById('nav-users').style.display='none';
+  }
 
   await Promise.all([
     loadTasks(),
@@ -119,19 +85,18 @@ async function showApp(){
   startRealtime();
 }
 
-function showAuth(){
-  document.getElementById('auth-screen').style.display='flex';
-  document.getElementById('app-screen').style.display='none';
-}
-
 // REALTIME
 function startRealtime(){
   sb.channel('tasks')
     .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks())
     .subscribe();
 
+  sb.channel('comments')
+    .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>loadTasks())
+    .subscribe();
+
   sb.channel('profiles')
-    .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},()=>loadProfiles())
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},()=>loadProfiles())
     .subscribe();
 }
 
@@ -142,25 +107,15 @@ async function loadTasks(){
   renderTasks();
 }
 
-function renderTasks(){
-  const wrap=document.getElementById('task-list');
-  wrap.innerHTML=tasks.map(t=>`
-    <div style="background:#fff;margin:5px;padding:10px;border-radius:6px;">
-      <b>${t.title}</b>
-      <div>
-        <input id="ci-${t.id}" placeholder="yorum"/>
-        <button onclick="addComment('${t.id}')">Gönder</button>
-      </div>
-    </div>
-  `).join('');
-}
-
 async function addTask(){
   const title=document.getElementById('f-title').value.trim();
   if(!title) return alert("Başlık gerekli");
 
-  await sb.from('tasks').insert({title,user_id:me.id});
-  document.getElementById('f-title').value='';
+  await sb.from('tasks').insert({
+    title,
+    user_id:me.id
+  });
+
   await loadTasks();
 }
 
@@ -178,6 +133,7 @@ async function addComment(taskId){
   });
 
   inp.value='';
+  await loadTasks();
 }
 
 // USERS
@@ -189,33 +145,39 @@ async function loadProfiles(){
 
 function renderUsers(){
   const wrap=document.getElementById('user-list');
+  if(!wrap) return;
 
   wrap.innerHTML=`
-  <table border="1" cellpadding="6">
-    <tr><th>Ad</th><th>Email</th><th>Rol</th><th>Durum</th></tr>
-    ${profiles.map(p=>`
-      <tr>
-        <td>${p.full_name||''}</td>
-        <td>${p.email||p.id}</td>
-        <td>${p.role||'member'}</td>
-        <td>
-          <select onchange="setStatus('${p.id}',this.value)">
-            <option value="online" ${p.status==='online'?'selected':''}>online</option>
-            <option value="offline" ${p.status==='offline'?'selected':''}>offline</option>
-            <option value="break" ${p.status==='break'?'selected':''}>mola</option>
-            <option value="meeting" ${p.status==='meeting'?'selected':''}>toplantı</option>
-          </select>
-        </td>
-      </tr>
-    `).join('')}
+  <table class="user-table">
+    <thead>
+      <tr><th>Ad</th><th>Email</th><th>Rol</th><th>Durum</th></tr>
+    </thead>
+    <tbody>
+      ${profiles.map(p=>`
+        <tr>
+          <td>${p.full_name||''}</td>
+          <td>${p.email||p.id}</td>
+          <td>${p.role||'agent'}</td>
+          <td>
+            <select onchange="setStatus('${p.id}',this.value)">
+              <option value="online" ${p.status==='online'?'selected':''}>online</option>
+              <option value="offline" ${p.status==='offline'?'selected':''}>offline</option>
+              <option value="break" ${p.status==='break'?'selected':''}>mola</option>
+              <option value="meeting" ${p.status==='meeting'?'selected':''}>toplantı</option>
+            </select>
+          </td>
+        </tr>
+      `).join('')}
+    </tbody>
   </table>`;
 }
 
+// STATUS
 async function setStatus(id,val){
   await sb.from('profiles').update({status:val}).eq('id',id);
 }
 
-// TEAMS
+// TEAM
 async function loadTeams(){
   const {data}=await sb.from('teams').select('*');
   teams=data||[];
@@ -224,16 +186,15 @@ async function loadTeams(){
 
 function renderTeams(){
   const wrap=document.getElementById('team-list');
+  if(!wrap) return;
 
   wrap.innerHTML=teams.map(t=>`
-    <div style="background:#fff;padding:10px;margin:5px;">
-      <b>${t.name}</b>
+    <div class="team-card">
+      <b>${t.name}</b><br>
+      ${profiles.map(p=>`<div>${p.full_name}</div>`).join('')}
     </div>
   `).join('');
 }
 
 init();
 </script>
-
-</body>
-</html>

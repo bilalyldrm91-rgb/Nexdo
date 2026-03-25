@@ -1,159 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>İş Takip</title>
+
+<!-- SUPABASE (ÖNCE YÜKLENİR) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{font-family:sans-serif;background:#f5f5f5;margin:0}
+.box{max-width:400px;margin:80px auto;background:#fff;padding:20px;border-radius:10px}
+input,button{width:100%;padding:10px;margin-top:10px}
+button{background:#111;color:#fff;border:none;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="auth" class="box">
+  <h3>Giriş</h3>
+  <input id="email" placeholder="email">
+  <input id="pass" type="password" placeholder="şifre">
+  
+  <label>
+    <input type="checkbox" id="remember"> Beni hatırla
+  </label>
+
+  <button onclick="login()">Giriş Yap</button>
+</div>
+
+<div id="app" class="box" style="display:none;">
+  <h3>Görevler</h3>
+
+  <input id="taskInput" placeholder="Görev yaz">
+  <button onclick="addTask()">Ekle</button>
+
+  <div id="list"></div>
+
+  <button onclick="logout()">Çıkış Yap</button>
+</div>
+
 <script>
 const SB_URL='https://cvgxwpxvtxedajzrnand.supabase.co';
 const SB_KEY='sb_publishable_cJp6p5cSfJwOynI5kCK_2Q_EPP4bijp';
-const TG_TOKEN='8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs';
 
-let sb,me=null,myProfile=null;
-let tasks=[],profiles=[],teams=[];
-let userStatus={}; // durum sistemi
+let sb;
+let user=null;
 
+// INIT
 async function init(){
-  sb=supabase.createClient(SB_URL,SB_KEY);
+  if(!window.supabase){
+    alert("Supabase yüklenmedi!");
+    return;
+  }
 
-  // BENİ HATIRLA
-  const remember=localStorage.getItem('remember_me');
-  if(remember==='1'){
-    const {data:{session}}=await sb.auth.getSession();
-    if(session){me=session.user;await showApp();}
-    else showAuth();
-  } else showAuth();
+  sb = window.supabase.createClient(SB_URL, SB_KEY);
 
-  sb.auth.onAuthStateChange(async(_,s)=>{
-    if(s){me=s.user;await showApp();}
-    else{me=null;showAuth();}
-  });
+  const remember = localStorage.getItem("remember");
+
+  if(remember){
+    const {data:{session}} = await sb.auth.getSession();
+    if(session){
+      user = session.user;
+      showApp();
+      loadTasks();
+      return;
+    }
+  }
+
+  showAuth();
 }
 
-async function doLogin(){
-  const email=document.getElementById('l-email').value.trim();
-  const pass=document.getElementById('l-pass').value;
-  const remember=document.getElementById('remember-me')?.checked;
+// LOGIN
+async function login(){
+  const email=document.getElementById('email').value;
+  const pass=document.getElementById('pass').value;
+  const remember=document.getElementById('remember').checked;
 
-  if(remember) localStorage.setItem('remember_me','1');
-  else localStorage.removeItem('remember_me');
+  if(remember) localStorage.setItem("remember","1");
 
-  const {error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error) alert('Hatalı giriş');
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+
+  if(error){
+    alert("Hatalı giriş");
+    return;
+  }
+
+  user=data.user;
+  showApp();
+  loadTasks();
 }
 
-async function doLogout(){
+// LOGOUT
+async function logout(){
   await sb.auth.signOut();
-  localStorage.removeItem('remember_me');
+  localStorage.removeItem("remember");
   location.reload();
 }
 
-// PROFİL + DURUM
-async function showApp(){
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('app-screen').style.display='flex';
-
-  const {data}=await sb.from('profiles').select('*').eq('id',me.id).single();
-  myProfile=data;
-
-  await loadProfiles();
-  await loadTasks();
-  await loadTeams();
+// UI
+function showApp(){
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='block';
 }
 
-// KULLANICI LİSTESİ FIX
-async function loadProfiles(){
-  const {data}=await sb.from('profiles').select('*');
-  profiles=data||[];
-
-  profiles.forEach(p=>{
-    if(!userStatus[p.id]) userStatus[p.id]='online';
-  });
-
-  renderUsers();
+function showAuth(){
+  document.getElementById('auth').style.display='block';
+  document.getElementById('app').style.display='none';
 }
 
-function renderUsers(){
-  document.getElementById('user-list').innerHTML=`
-  <table class="user-table">
-    <thead>
-      <tr><th>Ad</th><th>Email</th><th>Durum</th></tr>
-    </thead>
-    <tbody>
-      ${profiles.map(p=>`
-        <tr>
-          <td>${p.full_name}</td>
-          <td>${p.email || '-'}</td>
-          <td>
-            <select onchange="setStatus('${p.id}',this.value)">
-              <option ${userStatus[p.id]=='online'?'selected':''}>online</option>
-              <option ${userStatus[p.id]=='offline'?'selected':''}>offline</option>
-              <option ${userStatus[p.id]=='meeting'?'selected':''}>toplantı</option>
-              <option ${userStatus[p.id]=='break'?'selected':''}>mola</option>
-            </select>
-          </td>
-        </tr>
-      `).join('')}
-    </tbody>
-  </table>`;
-}
-
-function setStatus(id,val){
-  userStatus[id]=val;
-}
-
-// TASK FIX
+// TASK
 async function loadTasks(){
   const {data}=await sb.from('tasks').select('*').order('created_at',{ascending:false});
-  tasks=data||[];
-  renderTasks();
-}
+  const list=document.getElementById('list');
 
-function renderTasks(){
-  document.getElementById('task-list').innerHTML=
-    tasks.map(t=>`<div class="task-card">${t.title}</div>`).join('');
+  list.innerHTML=(data||[]).map(t=>`
+    <div style="background:#eee;margin-top:5px;padding:8px;border-radius:5px">
+      ${t.title}
+    </div>
+  `).join('');
 }
 
 async function addTask(){
-  const title=document.getElementById('f-title').value;
-  if(!title) return alert('Başlık gerekli');
+  const val=document.getElementById('taskInput').value;
+  if(!val) return;
 
   await sb.from('tasks').insert({
-    title,
-    user_id:me.id
+    title:val,
+    user_id:user.id
   });
 
-  await loadTasks(); // ANINDA REFRESH
-  closeModal('taskModal');
-}
-
-// YORUM FIX
-async function addComment(taskId){
-  const inp=document.getElementById('ci-'+taskId);
-  const content=inp.value.trim();
-  if(!content) return;
-
-  await sb.from('comments').insert({
-    task_id:taskId,
-    content,
-    user_id:me.id
-  });
-
-  inp.value='';
-  await loadTasks(); // REFRESH
-}
-
-// TEAM FIX (kullanıcıları getir)
-async function loadTeams(){
-  const {data}=await sb.from('teams').select('*');
-  teams=data||[];
-  renderTeams();
-}
-
-function renderTeams(){
-  document.getElementById('team-list').innerHTML=
-    teams.map(t=>`
-      <div class="team-card">
-        <b>${t.name}</b><br>
-        Kullanıcılar:
-        ${profiles.map(p=>`<div>${p.full_name}</div>`).join('')}
-      </div>
-    `).join('');
+  document.getElementById('taskInput').value='';
+  loadTasks();
 }
 
 init();
 </script>
+
+</body>
+</html>

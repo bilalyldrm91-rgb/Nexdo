@@ -693,6 +693,18 @@ async function updateStatus(id,status){
   renderTasks();showToast('Durum güncellendi ✓');
 }
 
+async function sendEmail(type, to, taskTitle, assignedBy, deadline, priority) {
+  try {
+    await fetch('/api/notify-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, to, taskTitle, assignedBy, deadline, priority })
+    });
+  } catch(e) {
+    console.error('Email gönderilemedi:', e);
+  }
+}
+
 async function addAssigneeFromSelect(taskId){
   const sel=document.getElementById('ai-sel-'+taskId);
   const profileId=sel.value;if(!profileId)return;
@@ -704,6 +716,11 @@ async function addAssigneeFromSelect(taskId){
   if(!assignees[taskId])assignees[taskId]=[];
   if(!assignees[taskId].includes(displayName))assignees[taskId].push(displayName);
   sel.value='';expandedId=taskId;renderTasks();showToast('Kişi eklendi ✓');
+  // E-posta bildirimi gönder
+  const task=tasks.find(t=>t.id===taskId);
+  if(profile.id&&profile.id.includes('@')){
+    sendEmail('assigned',profile.id,task?.title||'',me.email,task?.deadline,task?.priority);
+  }
 }
 
 async function removeAssignee(taskId,email){
@@ -759,6 +776,16 @@ async function addComment(taskId){
   expandedId=taskId;
   renderTasks();
   showToast('Yorum eklendi ✓');
+  // @ etiketlenen kişilere e-posta gönder
+  const mentions=content.match(/@(\S+)/g)||[];
+  const task=tasks.find(t=>t.id===taskId);
+  for(const mention of mentions){
+    const name=mention.replace('@','');
+    const profile=profiles.find(p=>(p.full_name||'').replace(/ /g,'')===name);
+    if(profile&&profile.id&&profile.id.includes('@')){
+      sendEmail('mentioned',profile.id,task?.title||'',me.email,null,null);
+    }
+  }
 }
 
 function previewFiles(input){

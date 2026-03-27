@@ -36,10 +36,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sidebar-section{font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.6px;padding:0 10px;margin:10px 0 4px;}
 .user-block{margin-top:auto;padding:10px;border-top:1px solid #e8e8e4;}
 .user-name{font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:2px;}
-.user-email-small{font-size:11px;color:#888;word-break:break-all;margin-bottom:6px;}
+.user-email-small{font-size:11px;color:#888;word-break:break-all;margin-bottom:8px;}
 .status-pills{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;}
 .status-pill{padding:3px 8px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#888;}
-.status-pill.active-pill{border-color:transparent;font-weight:500;}
 .pill-online{background:#EAF3DE;color:#3B6D11;border-color:#EAF3DE;}
 .pill-away{background:#FAEEDA;color:#854F0B;border-color:#FAEEDA;}
 .pill-offline{background:#F1EFE8;color:#5F5E5A;border-color:#F1EFE8;}
@@ -93,7 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .inline-input{flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:7px;font-size:12px;font-family:inherit;color:#1a1a1a;min-width:0;}
 .inline-btn{padding:7px 12px;background:#1a1a1a;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;white-space:nowrap;}
 .attachments{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
-.attach-item{display:flex;align-items:center;gap:5px;background:#f0f0ea;border-radius:7px;padding:4px 10px;font-size:12px;color:#555;}
+.attach-item{display:flex;align-items:center;gap:5px;background:#f0f0ea;border-radius:7px;padding:4px 10px;font-size:12px;}
 .attach-item a{color:#185FA5;text-decoration:none;}
 .attach-item a:hover{text-decoration:underline;}
 .file-input-label{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border:1px dashed #ddd;border-radius:7px;font-size:12px;cursor:pointer;color:#888;}
@@ -103,13 +102,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .comment-email{font-size:11px;font-weight:500;color:#555;}
 .comment-time{font-size:10px;color:#bbb;}
 .comment-text{font-size:13px;color:#333;line-height:1.5;}
+.comment-text .mention{color:#3C3489;font-weight:500;}
 .comment-attach{margin-top:5px;}
 .comment-attach a{font-size:12px;color:#185FA5;text-decoration:none;}
-.comment-form{display:flex;gap:6px;align-items:flex-end;margin-top:8px;}
+.comment-form{display:flex;gap:6px;align-items:flex-end;margin-top:8px;position:relative;}
 .comment-input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:7px;font-size:13px;font-family:inherit;color:#1a1a1a;resize:none;}
 .comment-side{display:flex;flex-direction:column;gap:4px;}
 .comment-btn{padding:8px 12px;background:#1a1a1a;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;}
 .comment-file-btn{padding:6px 10px;border:1px solid #ddd;border-radius:7px;font-size:12px;cursor:pointer;background:#fff;color:#555;text-align:center;}
+.mention-dropdown{position:absolute;bottom:100%;left:0;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);min-width:200px;max-height:160px;overflow-y:auto;z-index:50;display:none;}
+.mention-item{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.mention-item:hover{background:#f5f5f0;}
+.mention-avatar{width:24px;height:24px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#3C3489;flex-shrink:0;}
 .meeting-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:15px 16px;margin-bottom:9px;}
 .meeting-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 .meeting-title{font-size:14px;font-weight:500;margin-bottom:4px;}
@@ -124,9 +128,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .role-member{background:#EAF3DE;color:#3B6D11;}
 .role-viewer{background:#F1EFE8;color:#5F5E5A;}
 .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;}
-.dot-online{background:#3B6D11;}
-.dot-away{background:#854F0B;}
-.dot-offline{background:#ccc;}
+.dot-online{background:#3B6D11;}.dot-away{background:#854F0B;}.dot-offline{background:#ccc;}
 .team-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:15px 16px;margin-bottom:9px;}
 .team-members-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
 .team-member-tag{background:#f0f0ea;border-radius:20px;padding:2px 9px;font-size:12px;color:#555;}
@@ -140,6 +142,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tg-info{background:#E6F1FB;border:1px solid #85B7EB;border-radius:8px;padding:11px 13px;font-size:12px;color:#185FA5;margin-bottom:14px;line-height:1.7;}
 .tg-info code{background:#fff;padding:2px 5px;border-radius:4px;font-size:11px;word-break:break-all;display:block;margin-top:4px;}
 .msg-preview{font-size:12px;color:#666;background:#f8f8f4;padding:9px 11px;border-radius:8px;margin-bottom:12px;line-height:1.6;white-space:pre-wrap;display:none;}
+.checkbox-list{max-height:160px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;padding:6px;}
+.checkbox-list label{display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-radius:6px;font-size:13px;}
+.checkbox-list label:hover{background:#f5f5f0;}
+.multi-select{border:1px solid #ddd;border-radius:8px;padding:6px;max-height:130px;overflow-y:auto;}
+.multi-select label{display:flex;align-items:center;gap:8px;padding:5px 8px;cursor:pointer;border-radius:6px;font-size:13px;}
+.multi-select label:hover{background:#f5f5f0;}
 .toast{position:fixed;bottom:22px;right:22px;background:#1a1a1a;color:#fff;padding:10px 16px;border-radius:9px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.2s;pointer-events:none;}
 .toast.show{opacity:1;}
 .empty{text-align:center;padding:48px;color:#aaa;font-size:13px;}
@@ -191,7 +199,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="user-block">
       <div class="user-name" id="sb-name"></div>
       <div class="user-email-small" id="sb-email"></div>
-      <div class="detail-label" style="margin-bottom:5px;">Durumum</div>
+      <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Durumum</div>
       <div class="status-pills">
         <span class="status-pill" id="pill-online" onclick="setMyStatus('online')">🟢 Çevrimiçi</span>
         <span class="status-pill" id="pill-away" onclick="setMyStatus('away')">🟡 Mola</span>
@@ -230,7 +238,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
 
     <div id="view-users" style="display:none;">
-      <div class="header"><h1>Kullanıcılar</h1></div>
+      <div class="header"><h1>Kullanıcılar</h1><button class="btn-primary" onclick="loadProfiles()">↻ Yenile</button></div>
       <div id="user-list"><div class="empty">Yükleniyor...</div></div>
     </div>
 
@@ -268,16 +276,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </select>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">Görünürlük</label>
-      <select class="form-input" id="f-visibility" onchange="document.getElementById('f-team-group').style.display=this.value==='team'?'block':'none'">
+    <div class="form-group">
+      <label class="form-label">Görünürlük</label>
+      <select class="form-input" id="f-visibility" onchange="onVisibilityChange()">
         <option value="all">🌐 Herkes görsün</option>
+        <option value="sadece_ben">🔐 Sadece ben</option>
         <option value="team">👥 Belirli ekip</option>
-        <option value="assigned">🔒 Sadece atanan kişiler</option>
+        <option value="assigned">👤 Sadece atanan kişiler</option>
       </select>
     </div>
     <div class="form-group" id="f-team-group" style="display:none;">
-      <label class="form-label">Ekip</label>
+      <label class="form-label">Ekip Seç</label>
       <select class="form-input" id="f-team"><option value="">Ekip seçin...</option></select>
+    </div>
+    <div class="form-group" id="f-assigned-group" style="display:none;">
+      <label class="form-label">Atanacak Kişiler</label>
+      <div class="multi-select" id="f-assigned-list"></div>
     </div>
     <div class="form-group"><label class="form-label">Not</label><textarea class="form-input" id="f-note" rows="2" placeholder="Açıklama..."></textarea></div>
     <div class="form-group">
@@ -298,7 +312,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <h2>Toplantı Notu</h2>
     <div class="form-group"><label class="form-label">Başlık</label><input class="form-input" id="m-title" placeholder="Toplantı adı..."/></div>
     <div class="form-group"><label class="form-label">Tarih</label><input class="form-input" type="date" id="m-date"/></div>
-    <div class="form-group"><label class="form-label">Katılımcılar</label><input class="form-input" id="m-people" placeholder="Ahmet, Betül..."/></div>
+    <div class="form-group">
+      <label class="form-label">Katılımcılar</label>
+      <div class="checkbox-list" id="m-participants-list"></div>
+      <input class="form-input" id="m-people-extra" placeholder="Ekstra isim yazabilirsiniz..." style="margin-top:6px;"/>
+    </div>
     <div class="form-group"><label class="form-label">Notlar</label><textarea class="form-input" id="m-note" rows="3" placeholder="Toplantıda konuşulanlar..."></textarea></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('meetingModal')">İptal</button>
@@ -315,7 +333,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="form-group"><label class="form-label">Açıklama</label><input class="form-input" id="t-desc" placeholder="Kısa açıklama..."/></div>
     <div class="form-group">
       <label class="form-label">Üyeler</label>
-      <div id="team-member-checkboxes" style="max-height:180px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;padding:8px;"></div>
+      <div class="checkbox-list" id="team-member-checkboxes"></div>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('teamModal')">İptal</button>
@@ -352,7 +370,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       Chat ID'nizi bir kez girin, tarayıcı hatırlar.<br><br>
       <b>Chat ID nasıl öğrenilir?</b> Botunuzu bulun, <b>/start</b> yazın, sonra:<br>
       <code>https://api.telegram.org/bot8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs/getUpdates</code>
-      Sayfada <b>"id"</b> yazan sayıyı kopyalayın.
     </div>
     <div class="form-group"><label class="form-label">Telegram Chat ID</label><input class="form-input" id="tg-chat-input" placeholder="Örn: 933023424"/></div>
     <div class="msg-preview" id="tg-msg-preview"></div>
@@ -371,8 +388,7 @@ const SB_KEY='sb_publishable_cJp6p5cSfJwOynI5kCK_2Q_EPP4bijp';
 const TG_TOKEN='8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs';
 const STATUS_MAP={beklemede:{l:'⏳ Beklemede',c:'badge-gray'},devam:{l:'🔄 Devam Ediyor',c:'badge-blue'},donus:{l:'↩ Dönüş Bekleniyor',c:'badge-amber'},tamamlandi:{l:'✅ Tamamlandı',c:'badge-green'},iptal:{l:'❌ İptal',c:'badge-red'}};
 
-let sb,me=null,myProfile=null,tasks=[],meetings=[],comments={},assignees={},profiles=[],teams=[],currentFilter='all',expandedId=null,pendingTgMsg=null,selectedFiles=[];
-let commentFiles={};
+let sb,me=null,myProfile=null,tasks=[],meetings=[],comments={},assignees={},profiles=[],teams=[],currentFilter='all',expandedId=null,pendingTgMsg=null,selectedFiles=[],commentFiles={},statusRefreshInterval=null;
 
 async function init(){
   sb=supabase.createClient(SB_URL,SB_KEY);
@@ -381,7 +397,7 @@ async function init(){
   else showAuth();
   sb.auth.onAuthStateChange(async(_,s)=>{
     if(s&&s.user){me=s.user;await showApp();}
-    else{me=null;showAuth();}
+    else{me=null;if(statusRefreshInterval)clearInterval(statusRefreshInterval);showAuth();}
   });
 }
 
@@ -395,12 +411,10 @@ function switchTab(t){
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim();
   const pass=document.getElementById('l-pass').value;
-  const remember=document.getElementById('l-remember').checked;
   const msg=document.getElementById('auth-msg');
   msg.className='auth-msg';msg.textContent='Giriş yapılıyor...';
   const {error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error){msg.className='auth-msg err';msg.textContent=error.message==='Invalid login credentials'?'E-posta veya şifre hatalı':error.message;return;}
-  if(!remember){sessionStorage.setItem('no_remember','1');}
+  if(error){msg.className='auth-msg err';msg.textContent=error.message==='Invalid login credentials'?'E-posta veya şifre hatalı':error.message;}
 }
 
 async function doRegister(){
@@ -415,12 +429,13 @@ async function doRegister(){
   if(error){msg.className='auth-msg err';msg.textContent=error.message;return;}
   if(data.user){
     await sb.from('profiles').upsert({id:data.user.id,full_name:name,role:'member',status:'online',last_seen:new Date().toISOString()});
-    msg.className='auth-msg ok';msg.textContent='Kayıt başarılı! Giriş yapılıyor...';
+    msg.className='auth-msg ok';msg.textContent='Kayıt başarılı!';
   }
 }
 
 async function doLogout(){
-  if(myProfile){await sb.from('profiles').update({status:'offline',last_seen:new Date().toISOString()}).eq('id',me.id);}
+  if(statusRefreshInterval)clearInterval(statusRefreshInterval);
+  if(me)await sb.from('profiles').update({status:'offline',last_seen:new Date().toISOString()}).eq('id',me.id);
   await sb.auth.signOut();
   showAuth();
 }
@@ -433,21 +448,24 @@ function showAuth(){
 async function showApp(){
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('app-screen').style.display='flex';
-  const {data}=await sb.from('profiles').select('*').eq('id',me.id).single();
-  myProfile=data;
-  if(!myProfile){
-    await sb.from('profiles').insert({id:me.id,full_name:me.email,role:'member',status:'online',last_seen:new Date().toISOString()});
-    const {data:d2}=await sb.from('profiles').select('*').eq('id',me.id).single();
-    myProfile=d2;
-  } else {
-    await sb.from('profiles').update({status:'online',last_seen:new Date().toISOString()}).eq('id',me.id);
-    myProfile.status='online';
+  let {data}=await sb.from('profiles').select('*').eq('id',me.id).single();
+  if(!data){
+    await sb.from('profiles').insert({id:me.id,full_name:me.email.split('@')[0],role:'member',status:'online',last_seen:new Date().toISOString()});
+    const r=await sb.from('profiles').select('*').eq('id',me.id).single();
+    data=r.data;
   }
-  document.getElementById('sb-name').textContent=myProfile?.full_name||me.email;
+  myProfile=data;
+  await sb.from('profiles').update({status:'online',last_seen:new Date().toISOString()}).eq('id',me.id);
+  myProfile.status='online';
+  document.getElementById('sb-name').textContent=myProfile.full_name||me.email;
   document.getElementById('sb-email').textContent=me.email;
-  updateStatusPills(myProfile?.status||'online');
+  updateStatusPills('online');
   await Promise.all([loadTasks(),loadMeetings(),loadProfiles(),loadTeams()]);
-  setInterval(()=>sb.from('profiles').update({last_seen:new Date().toISOString()}).eq('id',me.id),60000);
+  if(statusRefreshInterval)clearInterval(statusRefreshInterval);
+  statusRefreshInterval=setInterval(async()=>{
+    await sb.from('profiles').update({last_seen:new Date().toISOString()}).eq('id',me.id);
+    await loadProfiles();
+  },30000);
 }
 
 async function setMyStatus(status){
@@ -455,18 +473,19 @@ async function setMyStatus(status){
   myProfile.status=status;
   updateStatusPills(status);
   await loadProfiles();
-  showToast(status==='online'?'Çevrimiçi oldunuz':status==='away'?'Mola moduna geçtiniz':'Çevrimdışı oldunuz');
+  const labels={online:'Çevrimiçi oldunuz',away:'Mola moduna geçtiniz',offline:'Çevrimdışı oldunuz'};
+  showToast(labels[status]);
 }
 
 function updateStatusPills(status){
-  document.getElementById('pill-online').className='status-pill'+(status==='online'?' active-pill pill-online':'');
-  document.getElementById('pill-away').className='status-pill'+(status==='away'?' active-pill pill-away':'');
-  document.getElementById('pill-offline').className='status-pill'+(status==='offline'?' active-pill pill-offline':'');
+  document.getElementById('pill-online').className='status-pill'+(status==='online'?' pill-online':'');
+  document.getElementById('pill-away').className='status-pill'+(status==='away'?' pill-away':'');
+  document.getElementById('pill-offline').className='status-pill'+(status==='offline'?' pill-offline':'');
 }
 
 async function loadTasks(){
   const {data,error}=await sb.from('tasks').select('*').order('created_at',{ascending:false});
-  if(error){console.error('Tasks error:',error);showToast('Görevler yüklenemedi: '+error.message);return;}
+  if(error){showToast('Görev yükleme hatası: '+error.message);return;}
   tasks=data||[];
   const {data:cd}=await sb.from('comments').select('*').order('created_at',{ascending:true});
   comments={};(cd||[]).forEach(c=>{if(!comments[c.task_id])comments[c.task_id]=[];comments[c.task_id].push(c);});
@@ -482,12 +501,16 @@ async function loadMeetings(){
 
 async function loadProfiles(){
   const {data}=await sb.from('profiles').select('*');
-  profiles=data||[];renderUsers();
+  profiles=data||[];
+  const currentView=document.querySelector('.nav-item.active')?.id?.replace('nav-','');
+  if(currentView==='users')renderUsers();
 }
 
 async function loadTeams(){
-  const {data}=await sb.from('teams').select('*').order('created_at',{ascending:false}).catch(()=>({data:[]}));
-  teams=data||[];renderTeams();
+  const {data,error}=await sb.from('teams').select('*').order('created_at',{ascending:false});
+  if(error){showToast('Ekip yükleme hatası: '+error.message);return;}
+  teams=data||[];
+  renderTeams();
   const sel=document.getElementById('f-team');
   sel.innerHTML='<option value="">Ekip seçin...</option>';
   teams.forEach(t=>sel.innerHTML+=`<option value="${t.id}">${t.name}</option>`);
@@ -516,6 +539,8 @@ function renderTasks(){
     const tc=comments[t.id]||[],ta=assignees[t.id]||[];
     const done=['tamamlandi','iptal'].includes(t.status);
     let files=[];try{files=t.files?JSON.parse(t.files):[];}catch(e){}
+    const safeTitle=t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    const safeNote=(t.note||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
     return `<div class="task-card ${expandedId===t.id?'expanded':''}">
       <div class="task-top">
         <div class="task-info" onclick="toggleExpand('${t.id}')">
@@ -523,8 +548,8 @@ function renderTasks(){
           <div class="task-meta">${pBadge(t.priority)}${sBadge(t.status||'beklemede')}${dlLabel(t.deadline,done)}${ta.map(e=>`<span class="badge badge-purple">@${e.split('@')[0]}</span>`).join('')}${tc.length?`<span class="badge badge-gray">💬 ${tc.length}</span>`:''}</div>
         </div>
         <div class="task-btns">
-          <button class="icon-btn ai-btn" onclick="aiResearch('${t.id}','${t.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">✦ Araştır</button>
-          <button class="icon-btn tg-btn" onclick="prepareTg('gorev','${t.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${t.deadline||''}','${t.priority}','${t.status||'beklemede'}')">✈</button>
+          <button class="icon-btn ai-btn" onclick="aiResearch('${t.id}','${safeTitle}')">✦ Araştır</button>
+          <button class="icon-btn tg-btn" onclick="prepareTg('gorev','${safeTitle}','${t.deadline||''}','${t.priority}','${t.status||'beklemede'}')">✈</button>
         </div>
       </div>
       <div class="task-detail ${expandedId===t.id?'show':''}">
@@ -535,9 +560,15 @@ function renderTasks(){
           <select class="status-select" onchange="updateStatus('${t.id}',this.value)">${Object.entries(STATUS_MAP).map(([k,v])=>`<option value="${k}" ${(t.status||'beklemede')===k?'selected':''}>${v.l}</option>`).join('')}</select>
         </div>
         <div class="detail-section">
-          <div class="detail-label">Kişi Etiketle</div>
+          <div class="detail-label">Atanan Kişiler</div>
           <div class="assignees-wrap">${ta.map(e=>`<span class="assignee-tag">${e} <button onclick="removeAssignee('${t.id}','${e}')">✕</button></span>`).join('')}</div>
-          <div class="inline-form"><input class="inline-input" id="ai-inp-${t.id}" placeholder="eposta@sirket.com" type="email"/><button class="inline-btn" onclick="addAssignee('${t.id}')">Ekle</button></div>
+          <div class="inline-form">
+            <select class="inline-input" id="ai-sel-${t.id}">
+              <option value="">Kişi seç...</option>
+              ${profiles.map(p=>`<option value="${p.id}">${p.full_name||p.id.substring(0,8)}</option>`).join('')}
+            </select>
+            <button class="inline-btn" onclick="addAssigneeFromSelect('${t.id}')">Ekle</button>
+          </div>
         </div>
         <div class="detail-section">
           <div class="detail-label">Dosyalar</div>
@@ -548,25 +579,60 @@ function renderTasks(){
           <div class="detail-label">Açıklama</div>
           <div class="detail-note">${t.note||'Henüz not eklenmedi.'}</div>
           <div style="display:flex;gap:6px;margin-top:8px;">
-            <button class="icon-btn" onclick="editNote('${t.id}','${(t.note||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">✏ Düzenle</button>
+            <button class="icon-btn" onclick="editNote('${t.id}','${safeNote}')">✏ Düzenle</button>
             <button class="icon-btn" style="color:#A32D2D;" onclick="deleteTask('${t.id}')">✕ Sil</button>
           </div>
         </div>
         <div class="detail-section">
           <div class="detail-label">Yorumlar (${tc.length})</div>
-          ${tc.map(c=>`<div class="comment"><div class="comment-header"><span class="comment-email">${c.user_email||''}</span><span class="comment-time">${fmtDT(c.created_at)}</span></div><div class="comment-text">${c.content}</div>${c.file_url?`<div class="comment-attach">📎 <a href="${c.file_url}" target="_blank">${c.file_name||'Dosya'}</a></div>`:''}</div>`).join('')}
-          <div class="comment-form">
-            <textarea class="comment-input" id="ci-${t.id}" rows="2" placeholder="Yorum yaz..."></textarea>
+          ${tc.map(c=>`<div class="comment"><div class="comment-header"><span class="comment-email">${c.user_email||''}</span><span class="comment-time">${fmtDT(c.created_at)}</span></div><div class="comment-text">${renderMentions(c.content)}</div>${c.file_url?`<div class="comment-attach">📎 <a href="${c.file_url}" target="_blank">${c.file_name||'Dosya'}</a></div>`:''}</div>`).join('')}
+          <div class="comment-form" id="cf-form-${t.id}">
+            <div style="flex:1;position:relative;">
+              <textarea class="comment-input" id="ci-${t.id}" rows="2" placeholder="Yorum yaz... @ ile kişi etiketle" onkeyup="handleMentionInput(event,'${t.id}')"></textarea>
+              <div class="mention-dropdown" id="mention-dd-${t.id}"></div>
+            </div>
             <div class="comment-side">
               <label class="comment-file-btn" title="Dosya ekle">📎<input type="file" style="display:none;" onchange="setCommentFile(this,'${t.id}')"/></label>
               <button class="comment-btn" onclick="addComment('${t.id}')">↑</button>
             </div>
           </div>
-          <div id="cf-${t.id}" style="font-size:11px;color:#888;margin-top:4px;"></div>
+          <div id="cfile-${t.id}" style="font-size:11px;color:#888;margin-top:4px;"></div>
         </div>
       </div>
     </div>`;
   }).join('');
+}
+
+function renderMentions(text){
+  return text.replace(/@(\S+)/g,'<span class="mention">@$1</span>');
+}
+
+function handleMentionInput(e,taskId){
+  const ta=document.getElementById('ci-'+taskId);
+  const val=ta.value;
+  const cursor=ta.selectionStart;
+  const textBefore=val.substring(0,cursor);
+  const atMatch=textBefore.match(/@(\w*)$/);
+  const dd=document.getElementById('mention-dd-'+taskId);
+  if(atMatch){
+    const query=atMatch[1].toLowerCase();
+    const matches=profiles.filter(p=>(p.full_name||'').toLowerCase().includes(query));
+    if(matches.length){
+      dd.innerHTML=matches.map(p=>`<div class="mention-item" onclick="insertMention('${taskId}','${p.full_name||p.id}')"><div class="mention-avatar">${(p.full_name||'?')[0].toUpperCase()}</div>${p.full_name||p.id}</div>`).join('');
+      dd.style.display='block';
+    } else dd.style.display='none';
+  } else dd.style.display='none';
+}
+
+function insertMention(taskId,name){
+  const ta=document.getElementById('ci-'+taskId);
+  const val=ta.value;
+  const cursor=ta.selectionStart;
+  const textBefore=val.substring(0,cursor);
+  const newBefore=textBefore.replace(/@(\w*)$/,'@'+name.replace(/ /g,'')+' ');
+  ta.value=newBefore+val.substring(cursor);
+  document.getElementById('mention-dd-'+taskId).style.display='none';
+  ta.focus();
 }
 
 function renderMeetings(){
@@ -576,7 +642,7 @@ function renderMeetings(){
       <div class="meeting-top">
         <div style="flex:1;"><div class="meeting-title">${m.title}</div><div class="meeting-meta">📅 ${fmtDate(m.meeting_date)} · 👥 ${m.people||''}</div><div class="meeting-note">${m.note||''}</div></div>
         <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
-          <button class="icon-btn tg-btn" onclick="prepareTg('toplanti','${m.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${m.meeting_date||''}','','','${(m.people||'').replace(/'/g,"\\'")}','${(m.note||'').replace(/'/g,"\\'").replace(/\n/g,' ').replace(/"/g,'&quot;')}')">✈ Telegram</button>
+          <button class="icon-btn tg-btn" onclick="prepareTgMeeting('${m.id}')">✈ Telegram</button>
           <button class="icon-btn" style="color:#A32D2D;" onclick="deleteMeeting('${m.id}')">✕ Sil</button>
         </div>
       </div>
@@ -601,17 +667,18 @@ function renderUsers(){
 }
 
 function renderTeams(){
-  if(!teams.length){document.getElementById('team-list').innerHTML='<div class="empty">Henüz ekip oluşturulmadı</div>';return;}
-  document.getElementById('team-list').innerHTML=teams.map(t=>{
+  const el=document.getElementById('team-list');
+  if(!teams.length){el.innerHTML='<div class="empty">Henüz ekip oluşturulmadı</div>';return;}
+  el.innerHTML=teams.map(t=>{
     let members=[];try{members=t.members?JSON.parse(t.members):[];}catch(e){}
     return `<div class="team-card">
       <div class="meeting-top">
         <div style="flex:1;">
-          <div class="team-name">${t.name}</div>
-          <div class="meeting-meta">${t.description||''}</div>
-          <div class="team-members-list">${members.map(m=>`<span class="team-member-tag">${m}</span>`).join('')}</div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:4px;">${t.name}</div>
+          <div style="font-size:12px;color:#888;margin-bottom:6px;">${t.description||''}</div>
+          <div class="team-members-list">${members.map(m=>`<span class="team-member-tag">👤 ${m}</span>`).join('')}</div>
         </div>
-        <button class="icon-btn" style="color:#A32D2D;" onclick="deleteTeam('${t.id}')">✕ Sil</button>
+        <button class="icon-btn" style="color:#A32D2D;flex-shrink:0;" onclick="deleteTeam('${t.id}')">✕ Sil</button>
       </div>
     </div>`;
   }).join('');
@@ -626,14 +693,17 @@ async function updateStatus(id,status){
   renderTasks();showToast('Durum güncellendi ✓');
 }
 
-async function addAssignee(taskId){
-  const inp=document.getElementById('ai-inp-'+taskId);
-  const email=inp.value.trim();if(!email)return;
-  const {error}=await sb.from('task_assignees').upsert({task_id:taskId,user_email:email});
+async function addAssigneeFromSelect(taskId){
+  const sel=document.getElementById('ai-sel-'+taskId);
+  const profileId=sel.value;if(!profileId)return;
+  const profile=profiles.find(p=>p.id===profileId);if(!profile)return;
+  const email=profile.id;
+  const displayName=profile.full_name||profile.id.substring(0,8);
+  const {error}=await sb.from('task_assignees').upsert({task_id:taskId,user_email:displayName});
   if(error){showToast('Hata: '+error.message);return;}
   if(!assignees[taskId])assignees[taskId]=[];
-  if(!assignees[taskId].includes(email))assignees[taskId].push(email);
-  inp.value='';expandedId=taskId;renderTasks();showToast('Kişi eklendi ✓');
+  if(!assignees[taskId].includes(displayName))assignees[taskId].push(displayName);
+  sel.value='';expandedId=taskId;renderTasks();showToast('Kişi eklendi ✓');
 }
 
 async function removeAssignee(taskId,email){
@@ -646,24 +716,32 @@ async function uploadTaskFiles(taskId,input){
   if(!input.files.length)return;
   showToast('Dosya yükleniyor...');
   const t=tasks.find(t=>t.id===taskId);
-  let existing=[];try{existing=t.files?JSON.parse(t.files):[];}catch(e){}
+  let existing=[];try{existing=t&&t.files?JSON.parse(t.files):[];}catch(e){}
   for(const file of input.files){
     const path=`tasks/${taskId}/${Date.now()}_${file.name}`;
-    const {error}=await sb.storage.from('attachments').upload(path,file,{upsert:true});
-    if(!error){const {data:u}=sb.storage.from('attachments').getPublicUrl(path);existing.push({name:file.name,url:u.publicUrl});}
-    else showToast('Dosya yükleme hatası: '+error.message);
+    const {data,error}=await sb.storage.from('attachments').upload(path,file,{upsert:true});
+    if(error){showToast('Yükleme hatası: '+error.message);continue;}
+    const {data:u}=sb.storage.from('attachments').getPublicUrl(path);
+    existing.push({name:file.name,url:u.publicUrl});
   }
-  await sb.from('tasks').update({files:JSON.stringify(existing)}).eq('id',taskId);
-  t.files=JSON.stringify(existing);expandedId=taskId;renderTasks();showToast('Dosya eklendi ✓');
+  const {error:ue}=await sb.from('tasks').update({files:JSON.stringify(existing)}).eq('id',taskId);
+  if(ue){showToast('Kayıt hatası: '+ue.message);return;}
+  if(t)t.files=JSON.stringify(existing);
+  expandedId=taskId;renderTasks();showToast('Dosya eklendi ✓');
 }
 
 function setCommentFile(input,taskId){
-  if(input.files[0]){commentFiles[taskId]=input.files[0];const el=document.getElementById('cf-'+taskId);if(el)el.textContent='📎 '+input.files[0].name;}
+  if(input.files[0]){
+    commentFiles[taskId]=input.files[0];
+    const el=document.getElementById('cfile-'+taskId);
+    if(el)el.textContent='📎 '+input.files[0].name;
+  }
 }
 
 async function addComment(taskId){
   const inp=document.getElementById('ci-'+taskId);
-  const content=inp.value.trim();if(!content){showToast('Yorum boş olamaz');return;}
+  const content=inp.value.trim();
+  if(!content){showToast('Yorum boş olamaz');return;}
   let fileUrl=null,fileName=null;
   if(commentFiles[taskId]){
     const file=commentFiles[taskId];
@@ -671,22 +749,34 @@ async function addComment(taskId){
     const {error}=await sb.storage.from('attachments').upload(path,file,{upsert:true});
     if(!error){const {data:u}=sb.storage.from('attachments').getPublicUrl(path);fileUrl=u.publicUrl;fileName=file.name;}
     delete commentFiles[taskId];
-    const cfEl=document.getElementById('cf-'+taskId);if(cfEl)cfEl.textContent='';
+    const el=document.getElementById('cfile-'+taskId);if(el)el.textContent='';
   }
   const {data,error}=await sb.from('comments').insert({task_id:taskId,user_id:me.id,user_email:me.email,content,file_url:fileUrl,file_name:fileName}).select().single();
   if(error){showToast('Yorum eklenemedi: '+error.message);return;}
-  if(data){if(!comments[taskId])comments[taskId]=[];comments[taskId].push(data);inp.value='';expandedId=taskId;renderTasks();showToast('Yorum eklendi ✓');}
+  if(!comments[taskId])comments[taskId]=[];
+  comments[taskId].push(data);
+  inp.value='';
+  expandedId=taskId;
+  renderTasks();
+  showToast('Yorum eklendi ✓');
 }
 
 function previewFiles(input){
-  const list=document.getElementById('f-file-list');
   selectedFiles=Array.from(input.files);
-  list.innerHTML=selectedFiles.map(f=>`<span style="font-size:11px;background:#f0f0ea;padding:2px 8px;border-radius:5px;">📎 ${f.name}</span>`).join('');
+  document.getElementById('f-file-list').innerHTML=selectedFiles.map(f=>`<span style="font-size:11px;background:#f0f0ea;padding:2px 8px;border-radius:5px;">📎 ${f.name}</span>`).join('');
+}
+
+function onVisibilityChange(){
+  const val=document.getElementById('f-visibility').value;
+  document.getElementById('f-team-group').style.display=val==='team'?'block':'none';
+  document.getElementById('f-assigned-group').style.display=val==='assigned'?'block':'none';
 }
 
 async function addTask(){
   const title=document.getElementById('f-title').value.trim();
   if(!title){showToast('Başlık gerekli!');return;}
+  const vis=document.getElementById('f-visibility').value;
+  const teamId=document.getElementById('f-team').value||null;
   const {data:task,error}=await sb.from('tasks').insert({
     title,
     start_date:document.getElementById('f-start').value||null,
@@ -694,11 +784,17 @@ async function addTask(){
     priority:document.getElementById('f-priority').value,
     status:document.getElementById('f-status').value,
     note:document.getElementById('f-note').value,
-    visibility:document.getElementById('f-visibility').value,
-    team_id:document.getElementById('f-team').value||null,
+    visibility:vis,
+    team_id:teamId,
     files:'[]'
   }).select().single();
   if(error){showToast('Görev eklenemedi: '+error.message);return;}
+  if(vis==='assigned'){
+    const checked=Array.from(document.querySelectorAll('#f-assigned-list input:checked')).map(cb=>cb.value);
+    for(const name of checked){
+      await sb.from('task_assignees').insert({task_id:task.id,user_email:name});
+    }
+  }
   if(task&&selectedFiles.length){
     const existing=[];
     for(const file of selectedFiles){
@@ -715,25 +811,35 @@ async function addTask(){
 }
 
 async function addMeeting(){
-  const title=document.getElementById('m-title').value.trim();if(!title){showToast('Başlık gerekli!');return;}
-  const {error}=await sb.from('meetings').insert({title,meeting_date:document.getElementById('m-date').value||null,people:document.getElementById('m-people').value,note:document.getElementById('m-note').value});
+  const title=document.getElementById('m-title').value.trim();
+  if(!title){showToast('Başlık gerekli!');return;}
+  const checked=Array.from(document.querySelectorAll('#m-participants-list input:checked')).map(cb=>cb.value);
+  const extra=document.getElementById('m-people-extra').value.trim();
+  const allPeople=[...checked,...(extra?extra.split(',').map(s=>s.trim()).filter(Boolean):[])].join(', ');
+  const {error}=await sb.from('meetings').insert({title,meeting_date:document.getElementById('m-date').value||null,people:allPeople,note:document.getElementById('m-note').value});
   if(error){showToast('Hata: '+error.message);return;}
-  closeModal('meetingModal');document.getElementById('m-title').value='';document.getElementById('m-note').value='';
+  closeModal('meetingModal');
+  document.getElementById('m-title').value='';document.getElementById('m-note').value='';document.getElementById('m-people-extra').value='';
   showToast('Kaydedildi ✓');await loadMeetings();
 }
 
 async function addTeam(){
-  const name=document.getElementById('t-name').value.trim();if(!name){showToast('Ekip adı gerekli!');return;}
+  const name=document.getElementById('t-name').value.trim();
+  if(!name){showToast('Ekip adı gerekli!');return;}
   const checked=Array.from(document.querySelectorAll('#team-member-checkboxes input:checked')).map(cb=>cb.value);
-  const {error}=await sb.from('teams').insert({name,description:document.getElementById('t-desc').value,members:JSON.stringify(checked),created_by:me.id});
-  if(error){showToast('Hata: '+error.message);return;}
-  closeModal('teamModal');document.getElementById('t-name').value='';document.getElementById('t-desc').value='';
+  const {data,error}=await sb.from('teams').insert({name,description:document.getElementById('t-desc').value||'',members:JSON.stringify(checked),created_by:me.id}).select().single();
+  if(error){showToast('Ekip oluşturulamadı: '+error.message);return;}
+  closeModal('teamModal');
+  document.getElementById('t-name').value='';document.getElementById('t-desc').value='';
   showToast('Ekip oluşturuldu ✓');await loadTeams();
+  showView('teams');
 }
 
 async function deleteTeam(id){
   if(!confirm('Ekip silinsin mi?'))return;
-  await sb.from('teams').delete().eq('id',id);showToast('Silindi');await loadTeams();
+  const {error}=await sb.from('teams').delete().eq('id',id);
+  if(error){showToast('Silinemedi: '+error.message);return;}
+  showToast('Silindi');await loadTeams();
 }
 
 function openRoleModal(uid,name,role){
@@ -760,26 +866,30 @@ async function aiResearch(taskId,title){
     const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title})});
     const data=await res.json();
     loadEl.style.display='none';
-    resEl.innerHTML=(data.result||'Sonuç alınamadı.').replace(/\n/g,'<br>');
+    resEl.innerHTML=(data.result||data.error||'Sonuç alınamadı.').replace(/\n/g,'<br>');
     resEl.style.display='block';
   }catch(e){
-    loadEl.style.display='none';resEl.textContent='AI bağlantı hatası: '+e.message;resEl.style.display='block';
+    loadEl.style.display='none';resEl.textContent='Bağlantı hatası: '+e.message;resEl.style.display='block';
   }
 }
 
-function prepareTg(type,title,date,priority,status,people='',note=''){
-  let msg='';
-  if(type==='gorev'){
-    const d=dayDiff(date);
-    const pl=priority==='acil'?'🔴 Acil':priority==='orta'?'🟡 Orta':'🟢 Düşük';
-    const sl=STATUS_MAP[status]?.l||'';
-    let dl=date?`\n📅 Deadline: ${fmtDate(date)}`:'';
-    if(date&&d<=3&&d>=0)dl+=` (⏰ ${d} gün kaldı!)`;
-    if(date&&d<0)dl+=` (⚠ ${Math.abs(d)} gün geçti!)`;
-    msg=`📋 Görev Hatırlatması\n\n${title}\n${pl} · ${sl}${dl}`;
-  }else{msg=`📝 Toplantı Notu\n\n${title}\n📅 ${fmtDate(date)}\n👥 ${people}\n\n${note}`;}
-  pendingTgMsg=msg;
-  const p=document.getElementById('tg-msg-preview');p.textContent=msg;p.style.display='block';
+function prepareTg(type,title,date,priority,status){
+  const d=dayDiff(date);
+  const pl=priority==='acil'?'🔴 Acil':priority==='orta'?'🟡 Orta':'🟢 Düşük';
+  const sl=STATUS_MAP[status]?.l||'';
+  let dl=date?`\n📅 Deadline: ${fmtDate(date)}`:'';
+  if(date&&d<=3&&d>=0)dl+=` (⏰ ${d} gün kaldı!)`;
+  if(date&&d<0)dl+=` (⚠ ${Math.abs(d)} gün geçti!)`;
+  pendingTgMsg=`📋 Görev Hatırlatması\n\n${title}\n${pl} · ${sl}${dl}`;
+  const p=document.getElementById('tg-msg-preview');p.textContent=pendingTgMsg;p.style.display='block';
+  const saved=localStorage.getItem('tg_chat_id');if(saved)document.getElementById('tg-chat-input').value=saved;
+  openModal('tgModal');
+}
+
+function prepareTgMeeting(meetingId){
+  const m=meetings.find(x=>x.id===meetingId);if(!m)return;
+  pendingTgMsg=`📝 Toplantı Notu\n\n${m.title}\n📅 ${fmtDate(m.meeting_date)}\n👥 ${m.people||''}\n\n${m.note||''}`;
+  const p=document.getElementById('tg-msg-preview');p.textContent=pendingTgMsg;p.style.display='block';
   const saved=localStorage.getItem('tg_chat_id');if(saved)document.getElementById('tg-chat-input').value=saved;
   openModal('tgModal');
 }
@@ -801,13 +911,16 @@ async function editNote(id,cur){
   if(n!==null){
     const {error}=await sb.from('tasks').update({note:n}).eq('id',id);
     if(error){showToast('Hata: '+error.message);return;}
-    showToast('Güncellendi ✓');await loadTasks();expandedId=id;
+    const t=tasks.find(t=>t.id===id);if(t)t.note=n;
+    showToast('Güncellendi ✓');expandedId=id;renderTasks();
   }
 }
 
 async function deleteTask(id){
   if(!confirm('Bu görevi silmek istediğine emin misin?'))return;
-  await sb.from('tasks').delete().eq('id',id);expandedId=null;showToast('Silindi');await loadTasks();
+  const {error}=await sb.from('tasks').delete().eq('id',id);
+  if(error){showToast('Hata: '+error.message);return;}
+  expandedId=null;showToast('Silindi');await loadTasks();
 }
 
 async function deleteMeeting(id){
@@ -822,21 +935,42 @@ function showView(v){
     document.getElementById('view-'+n).style.display=n===v?'block':'none';
     document.getElementById('nav-'+n).classList.toggle('active',n===v);
   });
+  if(v==='users'){loadProfiles();}
+  if(v==='teams'){loadTeams();}
 }
 
 function openModal(id){
   document.getElementById(id).classList.add('show');
   const today=new Date().toISOString().split('T')[0];
-  if(id==='taskModal'){document.getElementById('f-start').value=today;document.getElementById('f-deadline').value=today;}
-  if(id==='meetingModal')document.getElementById('m-date').value=today;
+  if(id==='taskModal'){
+    document.getElementById('f-start').value=today;
+    document.getElementById('f-deadline').value=today;
+    document.getElementById('f-visibility').value='all';
+    document.getElementById('f-team-group').style.display='none';
+    document.getElementById('f-assigned-group').style.display='none';
+    const assignedList=document.getElementById('f-assigned-list');
+    assignedList.innerHTML=profiles.map(p=>`<label><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');
+  }
+  if(id==='meetingModal'){
+    document.getElementById('m-date').value=today;
+    const pList=document.getElementById('m-participants-list');
+    const teamOptions=teams.map(t=>`<label style="font-weight:500;background:#f5f5f0;"><input type="checkbox" value="${t.name} ekibi"/> 🏷 ${t.name} (ekip)</label>`).join('');
+    const userOptions=profiles.map(p=>`<label><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');
+    pList.innerHTML=teamOptions+userOptions;
+  }
   if(id==='teamModal'){
-    const wrap=document.getElementById('team-member-checkboxes');
-    wrap.innerHTML=profiles.map(p=>`<label style="display:flex;align-items:center;gap:8px;padding:5px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background='#f5f5f0'" onmouseout="this.style.background=''"><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');
+    document.getElementById('team-member-checkboxes').innerHTML=profiles.map(p=>`<label><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');
   }
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('show');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+document.addEventListener('click',function(e){
+  document.querySelectorAll('.mention-dropdown').forEach(dd=>{
+    if(!dd.contains(e.target)&&!e.target.classList.contains('comment-input'))dd.style.display='none';
+  });
+});
 
 init();
 </script>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>İş Takip</title>
+<title>Nexdo — Smart Work Management</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -295,7 +295,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- AUTH -->
 <div id="auth-screen" class="auth-wrap" style="display:flex;">
   <div class="auth-box">
-    <div class="auth-logo">İş Takip</div>
+    <div class="auth-logo">Nexdo</div>
     <div class="auth-sub">Ekibinizle görevlerinizi yönetin</div>
     <div class="form-group"><label class="form-label">E-posta</label><input class="form-input" id="l-email" type="email" placeholder="ornek@sirket.com"/></div>
     <div class="form-group"><label class="form-label">Şifre</label><input class="form-input" id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
@@ -308,7 +308,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- CHANGE PASS -->
 <div id="change-pass-screen" class="change-pass-wrap" style="display:none;">
   <div class="change-pass-box">
-    <div class="auth-logo" style="margin-bottom:6px;">İş Takip</div>
+    <div class="auth-logo" style="margin-bottom:6px;">Nexdo</div>
     <div style="font-size:13px;color:#888;margin-bottom:20px;">Lütfen şifrenizi değiştirin.</div>
     <div class="info-banner">Yönetici tarafından oluşturulan hesabınız için yeni bir şifre belirlemeniz gerekmektedir.</div>
     <div class="form-group"><label class="form-label">Yeni Şifre</label><input class="form-input" id="cp-pass1" type="password" placeholder="En az 6 karakter"/></div>
@@ -321,7 +321,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- APP -->
 <div id="app-screen" class="app" style="display:none;">
   <div class="sidebar">
-    <div class="sidebar-logo">İş Takip <div class="realtime-dot" id="rt-dot"></div></div>
+    <div class="sidebar-logo">Nexdo <div class="realtime-dot" id="rt-dot"></div></div>
     <div class="nav-item active" id="nav-tasks" onclick="showView('tasks')">📋 Görevler</div>
     <div class="nav-item" id="nav-dashboard" onclick="showView('dashboard')">📊 Dashboard</div>
     <div class="nav-item" id="nav-calendar" onclick="showView('calendar')">📅 Takvim</div>

@@ -418,7 +418,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
     <div class="auth-sub">Smart Work Management</div>
     <div class="form-group"><label class="form-label">E-posta</label><input class="form-input" id="l-email" type="email" placeholder="ornek@sirket.com" autocomplete="email"/></div>
     <div class="form-group"><label class="form-label">Şifre</label><input class="form-input" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-    <label class="checkbox-row"><input type="checkbox" id="l-remember" checked/> Beni hatırla</label>
+    <label class="checkbox-row"><input type="checkbox" id="l-remember" checked/> Beni hatırla <span style="font-size:11px;color:var(--gray-400);">(tarayıcı oturumu açık kalır)</span></label>
     <button class="btn-full" onclick="doLogin()">Giriş Yap</button>
     <div class="auth-msg" id="auth-msg"></div>
   </div>
@@ -472,11 +472,12 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
     <div class="nav-item" id="nav-teams" onclick="showView('teams')"><span class="nav-icon">🏷</span> Ekipler</div>
 
     <div class="user-block">
-      <!-- EKİP DURUMU - üstte -->
-      <div class="team-status-section">
-        <div class="team-status-title">Ekip Durumu <span style="font-size:9px;color:var(--gray-300);font-weight:400;">(tıkla mesaj at)</span></div>
+      <!-- EKİP DURUMU - nav menüsünün hemen altında -->
+      <div style="padding:8px 4px 6px;">
+        <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;">Ekip Durumu <span style="font-size:9px;font-weight:400;">(tıkla mesaj at)</span></div>
         <div class="team-status-list" id="team-status-list"></div>
       </div>
+      <div style="height:1px;background:var(--gray-200);margin:4px 0;"></div>
       <!-- PROFİL DROPDOWN - profil satırına tıklayınca açılır -->
       <div id="profile-menu" style="display:none;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:8px;margin-bottom:6px;box-shadow:0 4px 16px rgba(0,0,0,0.1);">
         <div style="font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px;padding:4px 8px;margin-bottom:4px;">Durum</div>
@@ -494,7 +495,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
         <div onclick="doLogout()" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:500;color:var(--danger);" onmouseover="this.style.background='var(--danger-light)'" onmouseout="this.style.background=''">🚪 Çıkış Yap</div>
       </div>
       <!-- PROFİL SATIRI - en altta -->
-      <div style="display:flex;align-items:center;gap:8px;padding:8px;border-top:1px solid var(--gray-200);margin-top:8px;cursor:pointer;border-radius:var(--radius);" onclick="toggleProfileMenu()" onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background=''">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px;border-top:1px solid var(--gray-200);margin-top:8px;cursor:pointer;border-radius:var(--radius);position:relative;" onclick="toggleProfileMenu(event)" onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background=''">
         <div class="user-av" id="sb-av" style="position:relative;flex-shrink:0;">N
           <div id="sb-status-dot" style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:#22c55e;border:2px solid #fff;"></div>
         </div>
@@ -822,16 +823,22 @@ function avInitial(s){return ((s||'?')[0]).toUpperCase();}
 
 let loginInProgress=false;
 async function init(){
-  sb=supabase.createClient(SB_URL,SB_KEY);
+  // Beni hatırla kapalıysa session'ı temizle
+  const remember=localStorage.getItem('nexdo_remember');
+  sb=supabase.createClient(SB_URL,SB_KEY,{
+    auth:{persistSession:remember!=='false',autoRefreshToken:true}
+  });
   const {data:{session}}=await sb.auth.getSession();
-  if(session){me=session.user;await afterLogin();}
-  else showScreen('auth');
+  if(session&&remember!=='false'){me=session.user;await afterLogin();}
+  else{
+    if(session)await sb.auth.signOut(); // remember=false ise çıkış yap
+    showScreen('auth');
+  }
   sb.auth.onAuthStateChange(async(event,s)=>{
     if(event==='SIGNED_OUT'){me=null;cleanup();showScreen('auth');return;}
-    // TOKEN_REFRESHED ve SIGNED_IN sadece uygulama kapalıysa işle
     if((event==='SIGNED_IN'||event==='TOKEN_REFRESHED')&&s?.user){
       const appOpen=document.getElementById('app-screen').style.display==='flex';
-      if(appOpen)return; // Zaten içerideyiz, refresh döngüsüne girme
+      if(appOpen)return;
       me=s.user;await afterLogin();
     }
   });
@@ -909,12 +916,14 @@ async function doChangePassword(){
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim();
   const pass=document.getElementById('l-pass').value;
+  const remember=document.getElementById('l-remember').checked;
   const msg=document.getElementById('auth-msg');
   if(!email&&!pass){msg.className='auth-msg err';msg.textContent='E-posta ve şifre gerekli';return;}
   if(!email){msg.className='auth-msg err';msg.textContent='E-posta gerekli';return;}
   if(!pass){msg.className='auth-msg err';msg.textContent='Şifre gerekli';return;}
   if(!email.includes('@')){msg.className='auth-msg err';msg.textContent='Geçerli bir e-posta girin';return;}
-  if(pass.length<6){msg.className='auth-msg err';msg.textContent='Şifre en az 6 karakter olmalı';return;}
+  if(pass.length<4){msg.className='auth-msg err';msg.textContent='Şifre çok kısa';return;}
+  localStorage.setItem('nexdo_remember', remember?'true':'false');
   msg.className='auth-msg';msg.textContent='Giriş yapılıyor...';
   const {error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){msg.className='auth-msg err';msg.textContent=error.message==='Invalid login credentials'?'E-posta veya şifre hatalı':error.message;}
@@ -1816,9 +1825,11 @@ async function assignRole(){
 }
 
 // PROFİL MENU
-function toggleProfileMenu(){
+function toggleProfileMenu(e){
+  if(e)e.stopPropagation();
   const m=document.getElementById('profile-menu');
-  if(m)m.style.display=m.style.display==='none'?'block':'none';
+  if(!m)return;
+  m.style.display=m.style.display==='none'?'block':'none';
 }
 
 // KİŞİ ARAMA - atama (görev modal)
@@ -1991,7 +2002,10 @@ document.addEventListener('click',function(e){
   if(kisiList&&!kisiList.contains(e.target)&&e.target.id!=='f-kisi-search')kisiList.style.display='none';
   // Profil menü kapat
   const pm=document.getElementById('profile-menu');
-  if(pm&&!pm.contains(e.target)&&!e.target.closest('.user-info-row'))pm.style.display='none';
+  if(pm&&pm.style.display!=='none'){
+    const profileRow=e.target.closest('[onclick*="toggleProfileMenu"]');
+    if(!profileRow&&!pm.contains(e.target))pm.style.display='none';
+  }
   // Modal dışına tıkla kapat
   document.querySelectorAll('.modal-overlay').forEach(m=>{if(e.target===m)m.classList.remove('show');});
 });

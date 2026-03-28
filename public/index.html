@@ -202,7 +202,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <body>
 
 <!-- AUTH -->
-<div id="auth-screen" class="auth-wrap" style="display:none;">
+<div id="auth-screen" class="auth-wrap" style="display:flex;">
   <div class="auth-box">
     <div class="auth-logo">İş Takip</div>
     <div class="auth-sub">Ekibinizle görevlerinizi yönetin</div>
@@ -548,6 +548,12 @@ function showScreen(screen){
   document.getElementById('auth-screen').style.display=screen==='auth'?'flex':'none';
   document.getElementById('change-pass-screen').style.display=screen==='change-pass'?'flex':'none';
   document.getElementById('app-screen').style.display=screen==='app'?'flex':'none';
+  // loading: auth ekranını göster
+  if(screen==='loading'){
+    document.getElementById('auth-screen').style.display='flex';
+    document.getElementById('change-pass-screen').style.display='none';
+    document.getElementById('app-screen').style.display='none';
+  }
 }
 
 async function afterLogin(){
@@ -1238,8 +1244,6 @@ document.addEventListener('click',function(e){
   });
 });
 
-// Başlangıçta loading göster
-showScreen('loading');
 init();
 </script>
 </body>

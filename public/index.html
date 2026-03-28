@@ -2,311 +2,410 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Nexdo — Smart Work Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
+:root{
+  --accent:#5B5FEF;
+  --accent-light:#EEEEFF;
+  --accent-hover:#4A4ED8;
+  --success:#2D7A3A;
+  --success-light:#E8F5EA;
+  --danger:#B91C1C;
+  --danger-light:#FEE2E2;
+  --warning:#92400E;
+  --warning-light:#FEF3C7;
+  --gray-50:#F9FAFB;
+  --gray-100:#F3F4F6;
+  --gray-200:#E5E7EB;
+  --gray-300:#D1D5DB;
+  --gray-400:#9CA3AF;
+  --gray-500:#6B7280;
+  --gray-600:#4B5563;
+  --gray-700:#374151;
+  --gray-900:#111827;
+  --sidebar-w:240px;
+  --radius:8px;
+  --radius-lg:12px;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh;}
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;}
-.auth-box{background:#fff;border-radius:16px;padding:36px;width:390px;max-width:92vw;border:1px solid #e8e8e4;}
-.auth-logo{font-size:22px;font-weight:700;margin-bottom:6px;}
-.auth-sub{font-size:13px;color:#888;margin-bottom:28px;}
-.form-group{margin-bottom:13px;}
-.form-label{font-size:12px;color:#888;margin-bottom:4px;display:block;}
-.form-input{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;color:#1a1a1a;background:#fff;outline:none;font-family:inherit;}
-.form-input:focus{border-color:#999;}
-.checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:13px;font-size:13px;color:#666;cursor:pointer;}
-.checkbox-row input{width:16px;height:16px;cursor:pointer;}
-.btn-full{width:100%;padding:11px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px;}
-.btn-full:hover{background:#333;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gray-100);color:var(--gray-900);min-height:100vh;font-size:14px;line-height:1.5;}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea22,#764ba222),var(--gray-100);}
+.auth-box{background:#fff;border-radius:16px;padding:40px;width:400px;max-width:92vw;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
+.auth-logo{font-size:24px;font-weight:700;color:var(--accent);margin-bottom:4px;letter-spacing:-0.5px;}
+.auth-sub{font-size:13px;color:var(--gray-400);margin-bottom:28px;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:12px;color:var(--gray-500);margin-bottom:5px;display:block;font-weight:500;}
+.form-input{width:100%;padding:10px 13px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:13px;color:var(--gray-900);background:#fff;outline:none;font-family:inherit;transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--accent);}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;color:var(--gray-500);cursor:pointer;}
+.checkbox-row input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
+.btn-full{width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;font-family:inherit;transition:background 0.15s;}
+.btn-full:hover{background:var(--accent-hover);}
 .auth-msg{font-size:12px;text-align:center;margin-top:12px;min-height:18px;}
-.auth-msg.err{color:#A32D2D;}.auth-msg.ok{color:#3B6D11;}
-.change-pass-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;}
-.change-pass-box{background:#fff;border-radius:16px;padding:36px;width:390px;max-width:92vw;border:1px solid #e8e8e4;}
-.info-banner{background:#EAF3DE;border:1px solid #C0DD97;border-radius:8px;padding:10px 14px;font-size:13px;color:#3B6D11;margin-bottom:16px;}
-/* APP */
+.auth-msg.err{color:var(--danger);}.auth-msg.ok{color:var(--success);}
+.change-pass-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--gray-100);}
+.change-pass-box{background:#fff;border-radius:16px;padding:40px;width:400px;max-width:92vw;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
+.info-banner{background:var(--success-light);border:1px solid #BBF7D0;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--success);margin-bottom:16px;}
+
+/* APP LAYOUT */
 .app{display:flex;min-height:100vh;}
-.sidebar{width:220px;background:#fff;border-right:1px solid #e8e8e4;padding:20px 14px;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;display:flex;flex-direction:column;z-index:10;}
-.main{margin-left:220px;padding:24px;flex:1;min-width:0;}
-.sidebar-logo{font-size:15px;font-weight:700;margin-bottom:24px;padding:4px 10px;display:flex;align-items:center;gap:6px;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:#666;margin-bottom:2px;position:relative;}
-.nav-item.active{background:#f0f0ea;color:#1a1a1a;font-weight:500;}
-.nav-item:hover{background:#f0f0ea;}
-.nav-badge{background:#A32D2D;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:auto;}
-.sep{height:1px;background:#e8e8e4;margin:8px 0;}
-.sidebar-section{font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.6px;padding:0 10px;margin:10px 0 4px;}
-.user-block{margin-top:auto;padding:10px;border-top:1px solid #e8e8e4;}
-.user-name{font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:2px;}
-.user-email-small{font-size:11px;color:#888;word-break:break-all;margin-bottom:6px;}
-.status-pills{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;}
-.status-pill{padding:3px 8px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#888;}
-.pill-online{background:#EAF3DE;color:#3B6D11;border-color:#EAF3DE;}
-.pill-away{background:#FAEEDA;color:#854F0B;border-color:#FAEEDA;}
-.pill-offline{background:#F1EFE8;color:#5F5E5A;border-color:#F1EFE8;}
-.btn-logout{width:100%;padding:7px;border:1px solid #ddd;border-radius:7px;background:none;font-size:12px;cursor:pointer;color:#888;margin-top:4px;}
-.btn-profile{width:100%;padding:7px;border:1px solid #ddd;border-radius:7px;background:none;font-size:12px;cursor:pointer;color:#555;margin-bottom:4px;}
-.realtime-dot{width:7px;height:7px;border-radius:50%;background:#3B6D11;animation:pulse 2s infinite;display:none;}
+.sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--gray-200);padding:16px 12px;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;display:flex;flex-direction:column;z-index:10;}
+.main{margin-left:var(--sidebar-w);padding:24px;flex:1;min-width:0;}
+
+/* SIDEBAR */
+.sidebar-logo{font-size:18px;font-weight:700;color:var(--accent);margin-bottom:20px;padding:4px 8px;display:flex;align-items:center;gap:8px;letter-spacing:-0.5px;}
+.realtime-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav-section{font-size:10px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.8px;padding:0 8px;margin:14px 0 4px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--gray-600);margin-bottom:1px;font-weight:500;transition:all 0.12s;}
+.nav-item:hover{background:var(--gray-100);color:var(--gray-900);}
+.nav-item.active{background:var(--accent-light);color:var(--accent);}
+.nav-item .nav-icon{font-size:15px;width:20px;text-align:center;}
+.nav-badge{background:var(--danger);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:auto;}
+.nav-sep{height:1px;background:var(--gray-200);margin:8px 0;}
+/* Task submenu */
+.task-sub{display:none;margin-left:8px;margin-bottom:2px;}
+.nav-subitem{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:12px;color:var(--gray-500);margin-bottom:1px;transition:all 0.12s;font-weight:500;}
+.nav-subitem:hover{background:var(--gray-100);color:var(--gray-700);}
+.nav-subitem.active-sub{background:var(--accent-light);color:var(--accent);}
+.nav-arrow{margin-left:auto;font-size:10px;transition:transform 0.2s;color:var(--gray-400);}
+/* User block */
+.user-block{margin-top:auto;padding-top:12px;border-top:1px solid var(--gray-200);}
+.user-info-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.user-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;background:var(--accent-light);color:var(--accent);}
+.user-details{flex:1;min-width:0;}
+.user-name{font-size:12px;font-weight:600;color:var(--gray-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-role-label{font-size:11px;color:var(--gray-400);}
+.status-pills{display:flex;gap:3px;margin-bottom:8px;}
+.status-pill{padding:4px 8px;border-radius:20px;font-size:11px;cursor:pointer;border:1.5px solid var(--gray-200);background:#fff;color:var(--gray-500);font-weight:500;transition:all 0.12s;flex:1;text-align:center;}
+.pill-online{background:var(--success-light);color:var(--success);border-color:var(--success-light);}
+.pill-away{background:var(--warning-light);color:var(--warning);border-color:var(--warning-light);}
+.pill-offline{background:var(--gray-100);color:var(--gray-500);border-color:var(--gray-100);}
+.btn-sm{width:100%;padding:7px;border:1.5px solid var(--gray-200);border-radius:var(--radius);background:none;font-size:12px;cursor:pointer;color:var(--gray-600);font-family:inherit;font-weight:500;margin-bottom:4px;transition:all 0.12s;text-align:left;}
+.btn-sm:hover{background:var(--gray-100);}
+/* Team status */
+.team-status-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-200);}
+.team-status-title{font-size:10px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
+.team-status-list{display:flex;flex-direction:column;gap:2px;max-height:130px;overflow-y:auto;}
+.ts-item{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:var(--radius);font-size:11px;color:var(--gray-600);}
+.ts-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.ts-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ts-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.ts-online{background:#22c55e;}.ts-away{background:#f59e0b;}.ts-offline{background:var(--gray-300);}
+
 /* HEADER */
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px;}
-.header h1{font-size:20px;font-weight:600;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;}
+.header h1{font-size:22px;font-weight:700;color:var(--gray-900);letter-spacing:-0.5px;}
 .header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.btn-primary{background:#1a1a1a;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;}
-.btn-primary:hover{background:#333;}
-.btn-secondary{background:#fff;color:#1a1a1a;border:1px solid #ddd;padding:9px 18px;border-radius:8px;font-size:13px;cursor:pointer;}
-.btn-secondary:hover{background:#f5f5f0;}
-.btn-danger{background:#A32D2D;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;cursor:pointer;}
+.btn-primary{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-weight:600;font-family:inherit;transition:background 0.15s;}
+.btn-primary:hover{background:var(--accent-hover);}
+.btn-secondary{background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-200);padding:8px 16px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-weight:500;font-family:inherit;}
+.btn-secondary:hover{background:var(--gray-50);}
+.btn-danger-outline{background:#fff;color:var(--danger);border:1.5px solid var(--danger-light);padding:8px 16px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-weight:500;font-family:inherit;}
+
 /* SEARCH */
 .search-bar{display:flex;gap:8px;margin-bottom:16px;}
-.search-input{flex:1;padding:9px 12px 9px 36px;border:1px solid #ddd;border-radius:8px;font-size:13px;color:#1a1a1a;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;outline:none;font-family:inherit;}
-.search-input:focus{border-color:#999;}
-/* STATS */
-.stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:22px;}
-.stat-card{background:#fff;border:1px solid #e8e8e4;border-radius:10px;padding:13px;cursor:pointer;transition:border-color 0.15s;}
-.stat-card:hover{border-color:#ccc;}
-.stat-card.active-filter{border-color:#1a1a1a;background:#f8f8f4;}
-.stat-label{font-size:11px;color:#999;margin-bottom:5px;}
-.stat-val{font-size:22px;font-weight:600;}
+.search-input{flex:1;padding:9px 13px 9px 38px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:13px;color:var(--gray-900);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 11px center;outline:none;font-family:inherit;transition:border-color 0.15s;}
+.search-input:focus{border-color:var(--accent);}
+
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all 0.15s;}
+.stat-card:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(91,95,239,0.1);}
+.stat-card.active-filter{border-color:var(--accent);background:var(--accent-light);}
+.stat-label{font-size:11px;color:var(--gray-400);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.stat-val{font-size:28px;font-weight:700;color:var(--gray-900);}
+
 /* FILTERS */
 .filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
-.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid #ddd;background:#fff;font-size:12px;cursor:pointer;color:#666;}
-.filter-btn.active{background:#1a1a1a;color:#fff;border-color:transparent;}
+.filter-btn{padding:5px 13px;border-radius:20px;border:1.5px solid var(--gray-200);background:#fff;font-size:12px;cursor:pointer;color:var(--gray-500);font-weight:500;font-family:inherit;transition:all 0.12s;}
+.filter-btn:hover{border-color:var(--gray-400);}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
 /* VIEW TOGGLE */
-.view-toggle{display:flex;gap:4px;background:#f5f5f0;border-radius:8px;padding:3px;}
-.view-btn{padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:none;background:none;color:#888;}
-.view-btn.active{background:#fff;color:#1a1a1a;font-weight:500;}
+.view-toggle{display:flex;gap:3px;background:var(--gray-100);border-radius:var(--radius);padding:3px;}
+.view-btn{padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:none;background:none;color:var(--gray-500);font-weight:500;font-family:inherit;transition:all 0.12s;}
+.view-btn.active{background:#fff;color:var(--gray-900);box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+
 /* TASK CARD */
-.task-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;margin-bottom:9px;overflow:hidden;transition:border-color 0.15s;}
-.task-card:hover{border-color:#ccc;}
-.task-card.expanded{border-color:#aaa;}
-.task-card-header{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;cursor:pointer;}
+.task-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);margin-bottom:8px;overflow:hidden;transition:all 0.15s;}
+.task-card:hover{border-color:var(--gray-300);box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.task-card.expanded{border-color:var(--accent);box-shadow:0 4px 16px rgba(91,95,239,0.1);}
+.task-card-header{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;cursor:pointer;}
 .task-info{flex:1;min-width:0;}
-.task-title{font-size:14px;font-weight:500;margin-bottom:5px;}
-.task-title.done{text-decoration:line-through;color:#aaa;}
+.task-title{font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:6px;line-height:1.4;}
+.task-title.done{text-decoration:line-through;color:var(--gray-400);}
 .task-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
-.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;white-space:nowrap;}
-.badge-red{background:#FCEBEB;color:#A32D2D;}.badge-amber{background:#FAEEDA;color:#854F0B;}
-.badge-green{background:#EAF3DE;color:#3B6D11;}.badge-blue{background:#E6F1FB;color:#185FA5;}
-.badge-gray{background:#F1EFE8;color:#5F5E5A;}.badge-purple{background:#EEEDFE;color:#3C3489;}
-.deadline{font-size:12px;color:#888;}.deadline.urgent{color:#A32D2D;font-weight:600;}
-.task-btns{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;}
-.icon-btn{background:none;border:1px solid #e0e0e0;border-radius:7px;padding:5px 9px;font-size:12px;cursor:pointer;color:#555;white-space:nowrap;}
-.icon-btn:hover{background:#f5f5f0;}
-.tg-btn{background:#E6F1FB;border-color:#85B7EB;color:#185FA5;font-weight:500;}
-.ai-btn{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489;font-weight:500;}
-.archive-btn{background:#F1EFE8;border-color:#D3D1C7;color:#5F5E5A;}
-/* TASK DETAIL - İKİYE BÖLÜNMÜŞ */
-.task-detail{display:none;border-top:1px solid #f0f0ea;}
-.task-detail.show{display:flex;}
-.task-detail-left{width:300px;flex-shrink:0;padding:16px;border-right:1px solid #f0f0ea;}
-.task-detail-right{flex:1;display:flex;flex-direction:column;min-width:0;}
-/* DURUM PILL BUTONLAR */
-.status-pills-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px;}
-.status-pill-btn{padding:5px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid transparent;font-weight:500;transition:all 0.15s;}
-.status-pill-btn.active-status{border-color:#1a1a1a;}
-.spb-beklemede{background:#F1EFE8;color:#5F5E5A;}
-.spb-devam{background:#E6F1FB;color:#185FA5;}
-.spb-donus{background:#FAEEDA;color:#854F0B;}
-.spb-tamamlandi{background:#EAF3DE;color:#3B6D11;}
-.spb-iptal{background:#FCEBEB;color:#A32D2D;}
-/* ATANAN KİŞİLER AVATAR */
-.assignee-avatars{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
-.assignee-av{display:flex;align-items:center;gap:6px;background:#f8f8f4;border-radius:20px;padding:4px 10px 4px 4px;}
-.av-circle{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
-.av-name{font-size:12px;color:#333;}
-.av-remove{background:none;border:none;cursor:pointer;color:#aaa;font-size:11px;margin-left:2px;padding:0;}
-.av-remove:hover{color:#A32D2D;}
-/* YORUMLAR CHAT */
-.chat-area{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;max-height:320px;background:#fafaf8;}
-.chat-msg{display:flex;gap:8px;align-items:flex-end;}
-.chat-msg.mine{flex-direction:row-reverse;}
-.chat-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
-.chat-bubble{max-width:75%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;}
-.chat-msg.mine .chat-bubble{background:#1a1a1a;color:#fff;border-bottom-right-radius:4px;}
-.chat-msg:not(.mine) .chat-bubble{background:#fff;border:1px solid #e8e8e4;color:#1a1a1a;border-bottom-left-radius:4px;}
-.chat-meta{font-size:10px;color:#aaa;margin-top:3px;text-align:right;}
-.chat-msg:not(.mine) .chat-meta{text-align:left;}
-.chat-mention{color:#3C3489;font-weight:500;}
-.chat-attach a{color:#185FA5;font-size:12px;text-decoration:none;}
-.chat-input-area{padding:12px 16px;border-top:1px solid #f0f0ea;display:flex;gap:8px;align-items:flex-end;background:#fff;}
-.chat-input{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:20px;font-size:13px;font-family:inherit;color:#1a1a1a;resize:none;max-height:80px;outline:none;}
-.chat-input:focus{border-color:#999;}
-.chat-send-btn{width:36px;height:36px;border-radius:50%;background:#1a1a1a;border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.chat-file-btn{width:36px;height:36px;border-radius:50%;background:#f5f5f0;border:1px solid #ddd;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.mention-dropdown{position:absolute;bottom:60px;left:16px;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);min-width:200px;max-height:160px;overflow-y:auto;z-index:50;display:none;}
+.badge{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.badge-red{background:var(--danger-light);color:var(--danger);}
+.badge-amber{background:var(--warning-light);color:var(--warning);}
+.badge-green{background:var(--success-light);color:var(--success);}
+.badge-blue{background:#DBEAFE;color:#1D4ED8;}
+.badge-gray{background:var(--gray-100);color:var(--gray-500);}
+.badge-purple{background:var(--accent-light);color:var(--accent);}
+.badge-indigo{background:#EEF2FF;color:#4338CA;}
+.deadline{font-size:11px;color:var(--gray-400);font-weight:500;}
+.deadline.urgent{color:var(--danger);font-weight:600;}
+.task-btns{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;}
+.icon-btn{background:none;border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:5px 9px;font-size:12px;cursor:pointer;color:var(--gray-600);white-space:nowrap;font-family:inherit;font-weight:500;transition:all 0.12s;}
+.icon-btn:hover{background:var(--gray-50);border-color:var(--gray-300);}
+.btn-ai{background:var(--accent-light);border-color:var(--accent-light);color:var(--accent);}
+.btn-ai:hover{background:#E0E1FF;}
+.btn-tg{background:#DBEAFE;border-color:#DBEAFE;color:#1D4ED8;}
+.btn-archive{background:var(--gray-100);border-color:var(--gray-200);color:var(--gray-500);}
+
+/* TASK DETAIL - YENİ TASARIM */
+.task-detail{display:none;border-top:1px solid var(--gray-100);}
+.task-detail.show{display:block;}
+/* Meta bar */
+.task-meta-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);flex-wrap:wrap;}
+.meta-chip{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--gray-200);background:#fff;cursor:default;}
+.meta-chip-label{font-size:10px;color:var(--gray-400);margin-right:2px;font-weight:600;text-transform:uppercase;}
+/* Durum butonları */
+.status-chips{display:flex;gap:4px;flex-wrap:wrap;}
+.status-chip{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all 0.12s;}
+.sc-beklemede{background:var(--gray-100);color:var(--gray-600);border-color:var(--gray-200);}
+.sc-beklemede.sc-active{background:var(--gray-700);color:#fff;border-color:var(--gray-700);}
+.sc-devam{background:#DBEAFE;color:#1D4ED8;border-color:#BFDBFE;}
+.sc-devam.sc-active{background:#1D4ED8;color:#fff;}
+.sc-donus{background:var(--warning-light);color:var(--warning);border-color:#FDE68A;}
+.sc-donus.sc-active{background:var(--warning);color:#fff;}
+.sc-tamamlandi{background:var(--success-light);color:var(--success);border-color:#BBF7D0;}
+.sc-tamamlandi.sc-active{background:var(--success);color:#fff;}
+.sc-iptal{background:var(--danger-light);color:var(--danger);border-color:#FECACA;}
+.sc-iptal.sc-active{background:var(--danger);color:#fff;}
+/* Atanan kişiler inline */
+.assignee-chips{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.assignee-chip{display:flex;align-items:center;gap:4px;background:var(--accent-light);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:500;color:var(--accent);}
+.assignee-chip-av{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;background:var(--accent);color:#fff;flex-shrink:0;}
+.assignee-chip-x{background:none;border:none;cursor:pointer;color:var(--accent);font-size:11px;padding:0;line-height:1;margin-left:2px;opacity:0.6;}
+.assignee-chip-x:hover{opacity:1;}
+.add-assignee-btn{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;border:1.5px dashed var(--gray-300);background:none;font-size:11px;color:var(--gray-400);cursor:pointer;font-family:inherit;transition:all 0.12s;}
+.add-assignee-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* Assignee dropdown */
+.assignee-dropdown{position:absolute;top:100%;left:0;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:0 8px 24px rgba(0,0,0,0.12);min-width:200px;max-height:200px;overflow-y:auto;z-index:50;display:none;}
+.assignee-dropdown-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:13px;cursor:pointer;}
+.assignee-dropdown-item:hover{background:var(--gray-50);}
+/* Description */
+.task-description{padding:14px 16px;border-bottom:1px solid var(--gray-100);}
+.task-desc-text{font-size:13px;color:var(--gray-600);line-height:1.7;background:var(--gray-50);padding:10px 12px;border-radius:var(--radius);margin-bottom:8px;}
+/* Files */
+.task-files{padding:10px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.file-chip{display:flex;align-items:center;gap:5px;background:var(--gray-100);border-radius:var(--radius);padding:4px 10px;font-size:12px;}
+.file-chip a{color:var(--accent);text-decoration:none;font-weight:500;}
+.file-add-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1.5px dashed var(--gray-300);border-radius:var(--radius);font-size:12px;cursor:pointer;color:var(--gray-400);font-family:inherit;}
+.file-add-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* AI Result */
+.ai-loading{font-size:13px;color:var(--accent);padding:10px 16px;display:none;}
+.ai-result-box{margin:0 16px 12px;background:var(--accent-light);border:1.5px solid #C7D2FE;padding:12px;border-radius:var(--radius);font-size:13px;line-height:1.7;display:none;color:var(--gray-700);}
+/* COMMENTS - tam genişlik chat */
+.comments-section{display:flex;flex-direction:column;}
+.comments-header{padding:10px 16px;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--gray-100);}
+.comments-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px;min-height:80px;max-height:280px;overflow-y:auto;background:var(--gray-50);}
+.comment-item{display:flex;gap:8px;}
+.comment-item.mine{flex-direction:row-reverse;}
+.comment-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.comment-body{max-width:75%;}
+.comment-item.mine .comment-body{align-items:flex-end;display:flex;flex-direction:column;}
+.comment-bubble{padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;}
+.comment-item.mine .comment-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.comment-item:not(.mine) .comment-bubble{background:#fff;border:1.5px solid var(--gray-200);color:var(--gray-900);border-bottom-left-radius:4px;}
+.comment-mention{color:#A5B4FC;font-weight:600;}
+.comment-item.mine .comment-mention{color:#C7D2FE;}
+.comment-attach a{font-size:11px;color:#A5B4FC;text-decoration:none;}
+.comment-meta{font-size:10px;color:var(--gray-400);margin-top:3px;}
+/* Comment input */
+.comment-input-area{padding:12px 16px;border-top:1px solid var(--gray-200);background:#fff;display:flex;gap:8px;align-items:flex-end;position:relative;}
+.comment-textarea{flex:1;padding:10px 13px;border:1.5px solid var(--gray-200);border-radius:12px;font-size:13px;font-family:inherit;color:var(--gray-900);resize:none;outline:none;min-height:42px;max-height:120px;line-height:1.5;transition:border-color 0.15s;}
+.comment-textarea:focus{border-color:var(--accent);}
+.comment-send-btn{width:38px;height:38px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:background 0.15s;}
+.comment-send-btn:hover{background:var(--accent-hover);}
+.comment-file-btn{width:38px;height:38px;border-radius:50%;background:var(--gray-100);border:1.5px solid var(--gray-200);color:var(--gray-500);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.comment-file-btn:hover{background:var(--gray-200);}
+.mention-dropdown{position:absolute;bottom:60px;left:16px;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:0 8px 24px rgba(0,0,0,0.12);min-width:200px;max-height:160px;overflow-y:auto;z-index:50;display:none;}
 .mention-item{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;}
-.mention-item:hover{background:#f5f5f0;}
-/* AI RESULT */
-.ai-loading{font-size:12px;color:#3C3489;padding:8px 12px;display:none;}
-.ai-result-box{margin:0 16px 12px;background:#EEEDFE;border:1px solid #AFA9EC;padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.6;display:none;}
-/* DOSYALAR */
-.attachments{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
-.attach-item{display:flex;align-items:center;gap:4px;background:#f0f0ea;border-radius:6px;padding:3px 8px;font-size:11px;}
-.attach-item a{color:#185FA5;text-decoration:none;}
-.file-input-label{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px dashed #ddd;border-radius:6px;font-size:11px;cursor:pointer;color:#888;}
-.file-input-label:hover{border-color:#aaa;}
-.detail-section-label{font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;margin-top:12px;}
-.detail-section-label:first-child{margin-top:0;}
-.detail-note-text{font-size:13px;color:#666;background:#f8f8f4;padding:8px 10px;border-radius:8px;line-height:1.6;margin-bottom:6px;}
+.mention-item:hover{background:var(--gray-50);}
+.mention-av{width:24px;height:24px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--accent);flex-shrink:0;}
+
 /* KANBAN */
-.kanban-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;overflow-x:auto;}
-.kanban-col{background:#f8f8f4;border-radius:10px;padding:12px;}
-.kanban-col-header{font-size:12px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
-.kanban-count{background:#fff;border-radius:10px;padding:1px 7px;font-size:11px;color:#888;}
-.kanban-card{background:#fff;border:1px solid #e8e8e4;border-radius:8px;padding:10px 12px;margin-bottom:7px;cursor:pointer;font-size:13px;}
-.kanban-card:hover{border-color:#ccc;}
+.kanban-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.kanban-col{background:var(--gray-100);border-radius:var(--radius-lg);padding:12px;}
+.kanban-col-header{font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.kanban-count{background:#fff;border-radius:10px;padding:1px 7px;font-size:11px;color:var(--gray-400);}
+.kanban-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:10px 12px;margin-bottom:7px;cursor:pointer;font-size:13px;transition:all 0.12s;}
+.kanban-card:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(91,95,239,0.1);}
+
 /* CALENDAR */
+.cal-wrap{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.cal-month{font-size:16px;font-weight:600;}
+.cal-month{font-size:16px;font-weight:700;color:var(--gray-900);}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
-.cal-day-label{text-align:center;font-size:11px;color:#aaa;padding:6px 0;font-weight:500;}
-.cal-day{min-height:80px;background:#fff;border:1px solid #e8e8e4;border-radius:8px;padding:6px;}
-.cal-day.today{border-color:#1a1a1a;}
-.cal-day.other-month{opacity:0.5;}
-.cal-day-num{font-size:12px;font-weight:500;margin-bottom:4px;}
-.cal-task-dot{font-size:10px;border-radius:4px;padding:1px 5px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#FAEEDA;color:#854F0B;}
-.cal-task-dot.urgent{background:#FCEBEB;color:#A32D2D;}
+.cal-day-label{text-align:center;font-size:11px;color:var(--gray-400);padding:6px 0;font-weight:600;}
+.cal-day{min-height:80px;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:6px;}
+.cal-day.today{border-color:var(--accent);background:var(--accent-light);}
+.cal-day.other-month{opacity:0.45;}
+.cal-day-num{font-size:12px;font-weight:600;margin-bottom:3px;color:var(--gray-700);}
+.cal-day.today .cal-day-num{color:var(--accent);}
+.cal-task-dot{font-size:10px;border-radius:4px;padding:1px 5px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--warning-light);color:var(--warning);font-weight:500;}
+.cal-task-dot.urgent{background:var(--danger-light);color:var(--danger);}
+
 /* DASHBOARD */
 .dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:20px;}
-.dash-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:18px;}
-.dash-card-title{font-size:13px;font-weight:600;margin-bottom:14px;color:#555;}
+.dash-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;}
+.dash-card-title{font-size:13px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;}
 .dash-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.dash-bar-label{font-size:12px;color:#666;width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.dash-bar-wrap{flex:1;background:#f5f5f0;border-radius:4px;height:8px;}
-.dash-bar{height:8px;border-radius:4px;background:#1a1a1a;}
-.dash-bar-val{font-size:12px;color:#888;width:30px;text-align:right;flex-shrink:0;}
-.dash-stat{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f0;}
+.dash-bar-label{font-size:12px;color:var(--gray-600);width:110px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+.dash-bar-wrap{flex:1;background:var(--gray-100);border-radius:4px;height:8px;}
+.dash-bar{height:8px;border-radius:4px;background:var(--accent);}
+.dash-bar-val{font-size:12px;color:var(--gray-400);width:30px;text-align:right;font-weight:600;}
+.dash-stat{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--gray-100);}
 .dash-stat:last-child{border-bottom:none;}
+.dash-stat-label{font-size:13px;color:var(--gray-600);}
+.dash-stat-val{font-size:14px;font-weight:700;color:var(--gray-900);}
+
 /* PAGINATION */
-.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;}
-.page-btn{width:32px;height:32px;border-radius:6px;border:1px solid #ddd;background:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.page-btn:hover{background:#f5f5f0;}
-.page-btn.active{background:#1a1a1a;color:#fff;border-color:transparent;}
+.pagination{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:16px;}
+.page-btn{width:32px;height:32px;border-radius:var(--radius);border:1.5px solid var(--gray-200);background:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:500;font-family:inherit;transition:all 0.12s;}
+.page-btn:hover{border-color:var(--accent);color:var(--accent);}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .page-btn:disabled{opacity:0.4;cursor:not-allowed;}
+
 /* CHAT */
-.chat-layout{display:flex;height:calc(100vh - 100px);background:#fff;border:1px solid #e8e8e4;border-radius:12px;overflow:hidden;}
-.chat-sidebar{width:240px;border-right:1px solid #e8e8e4;display:flex;flex-direction:column;flex-shrink:0;}
-.chat-sidebar-header{padding:14px 16px;border-bottom:1px solid #e8e8e4;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;}
-.chat-channel-list{flex:1;overflow-y:auto;padding:8px;}
-.chat-channel-item{padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:#666;display:flex;align-items:center;gap:6px;margin-bottom:2px;}
-.chat-channel-item:hover{background:#f5f5f0;}
-.chat-channel-item.active{background:#f0f0ea;color:#1a1a1a;font-weight:500;}
-.chat-channel-item .unread-dot{width:8px;height:8px;border-radius:50%;background:#A32D2D;margin-left:auto;flex-shrink:0;}
+.chat-layout{display:flex;height:calc(100vh - 100px);background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;}
+.chat-sidebar{width:240px;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;flex-shrink:0;background:var(--gray-50);}
+.chat-sidebar-header{padding:14px 16px;border-bottom:1px solid var(--gray-200);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;background:#fff;}
+.chat-ch-list{flex:1;overflow-y:auto;padding:8px;}
+.chat-ch-item{padding:8px 10px;border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--gray-600);display:flex;align-items:center;gap:7px;margin-bottom:2px;font-weight:500;transition:all 0.12s;}
+.chat-ch-item:hover{background:var(--gray-200);}
+.chat-ch-item.active{background:var(--accent-light);color:var(--accent);}
 .chat-main{flex:1;display:flex;flex-direction:column;min-width:0;}
-.chat-main-header{padding:14px 20px;border-bottom:1px solid #e8e8e4;display:flex;align-items:center;gap:10px;}
-.chat-main-title{font-size:14px;font-weight:600;}
-.chat-main-sub{font-size:12px;color:#888;}
-.chat-messages{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:6px;background:#fafaf8;}
+.chat-main-header{padding:14px 20px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;background:#fff;}
+.chat-main-title{font-size:15px;font-weight:700;flex:1;}
+.chat-messages{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;background:var(--gray-50);}
 .chat-msg-full{display:flex;gap:10px;align-items:flex-start;}
 .chat-msg-full.mine{flex-direction:row-reverse;}
-.chat-msg-full .chat-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;margin-top:2px;}
-.chat-msg-full .bubble-wrap{max-width:70%;}
+.chat-av-full{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.bubble-wrap{max-width:70%;}
 .chat-msg-full.mine .bubble-wrap{align-items:flex-end;display:flex;flex-direction:column;}
-.chat-bubble-full{padding:9px 14px;border-radius:14px;font-size:13px;line-height:1.5;}
-.chat-msg-full.mine .chat-bubble-full{background:#1a1a1a;color:#fff;border-bottom-right-radius:4px;}
-.chat-msg-full:not(.mine) .chat-bubble-full{background:#fff;border:1px solid #e8e8e4;color:#1a1a1a;border-bottom-left-radius:4px;}
-.chat-msg-meta{font-size:10px;color:#aaa;margin-top:3px;}
-.chat-input-row{padding:14px 20px;border-top:1px solid #e8e8e4;display:flex;gap:10px;align-items:flex-end;background:#fff;position:relative;}
-.chat-input-full{flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:22px;font-size:13px;font-family:inherit;color:#1a1a1a;resize:none;max-height:100px;outline:none;line-height:1.4;}
-.chat-input-full:focus{border-color:#999;}
-.chat-send{width:40px;height:40px;border-radius:50%;background:#1a1a1a;border:none;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;}
-.chat-date-sep{text-align:center;font-size:11px;color:#aaa;padding:8px 0;}
-/* MULTI PERSON */
-.multi-person-select{border:1px solid #ddd;border-radius:8px;overflow:hidden;max-height:200px;overflow-y:auto;}
-.person-option{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f5f0;}
-.person-option:last-child{border-bottom:none;}
-.person-option:hover{background:#f8f8f4;}
-.person-option.selected{background:#EEEDFE;}
-.person-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
-.person-name{font-size:13px;color:#1a1a1a;flex:1;}
-.person-check{width:18px;height:18px;border-radius:4px;border:1.5px solid #ddd;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;}
-.person-check.checked{background:#1a1a1a;border-color:#1a1a1a;color:#fff;}
-.inline-form{display:flex;gap:6px;margin-top:6px;}
-.inline-input{flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:7px;font-size:12px;font-family:inherit;color:#1a1a1a;min-width:0;}
-.inline-btn{padding:7px 12px;background:#1a1a1a;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;}
-/* ARCHIVE */
-.archived-task{background:#fff;border:1px solid #e8e8e4;border-radius:10px;padding:12px 14px;margin-bottom:8px;opacity:0.7;}
-.archived-task-title{font-size:13px;font-weight:500;color:#888;text-decoration:line-through;margin-bottom:4px;}
-/* MODALS */
-.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center;}
-.modal-overlay.show{display:flex;}
-.modal{background:#fff;border-radius:14px;padding:24px;width:500px;max-width:92vw;max-height:90vh;overflow-y:auto;}
-.modal h2{font-size:16px;font-weight:600;margin-bottom:16px;}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
-.btn-cancel{padding:9px 16px;border:1px solid #ddd;border-radius:8px;background:none;font-size:13px;cursor:pointer;color:#888;}
-.perm-section-title{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;margin:14px 0 8px;}
-.perm-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f0;font-size:13px;color:#333;}
-.perm-row:last-child{border-bottom:none;}
-.toggle{width:38px;height:22px;border-radius:11px;border:none;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;}
-.toggle.on{background:#3B6D11;}.toggle.off{background:#ddd;}
-.toggle::after{content:'';position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s;}
-.toggle.on::after{left:19px;}.toggle.off::after{left:3px;}
-.color-picker-row{display:flex;gap:8px;flex-wrap:wrap;}
-.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
-.color-swatch.selected{border-color:#1a1a1a;}
-.checkbox-list{max-height:150px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;padding:6px;}
-.checkbox-list label{display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-radius:6px;font-size:13px;}
-.checkbox-list label:hover{background:#f5f5f0;}
-.tg-info{background:#E6F1FB;border:1px solid #85B7EB;border-radius:8px;padding:11px 13px;font-size:12px;color:#185FA5;margin-bottom:14px;line-height:1.7;}
-.tg-info code{background:#fff;padding:2px 5px;border-radius:4px;font-size:11px;word-break:break-all;display:block;margin-top:4px;}
-.msg-preview{font-size:12px;color:#666;background:#f8f8f4;padding:9px 11px;border-radius:8px;margin-bottom:12px;line-height:1.6;white-space:pre-wrap;display:none;}
-/* TOAST */
-.toast{position:fixed;bottom:22px;right:22px;background:#1a1a1a;color:#fff;padding:10px 16px;border-radius:9px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.2s;pointer-events:none;display:flex;align-items:center;gap:8px;}
-.toast.show{opacity:1;}
-.empty{text-align:center;padding:48px;color:#aaa;font-size:13px;}
-.empty-icon{font-size:32px;margin-bottom:8px;}
-.highlight{background:#fff3cd;border-radius:2px;}
-/* EKİP DURUMU */
-.team-status-section{padding:8px 0;border-top:1px solid #e8e8e4;margin-top:6px;}
-.team-status-title{font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;padding:0 2px;}
-.team-status-list{display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto;}
-.team-status-item{display:flex;align-items:center;gap:6px;padding:3px 4px;border-radius:6px;font-size:12px;color:#555;}
-.team-status-item:hover{background:#f5f5f0;}
-.ts-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;}
-.ts-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;}
-.ts-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.ts-dot-online{background:#3B6D11;}
-.ts-dot-away{background:#854F0B;}
-.ts-dot-offline{background:#ddd;}
-.nav-subitem{padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;color:#666;margin-bottom:1px;display:flex;align-items:center;gap:6px;}
-.nav-subitem:hover{background:#f5f5f0;}
-.nav-subitem.active-sub{background:#f0f0ea;color:#1a1a1a;font-weight:500;}
-/* CHAT FONT SETTINGS */
-.chat-settings-bar{display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid #f0f0ea;background:#fafaf8;flex-wrap:wrap;}
-.chat-settings-bar label{font-size:11px;color:#888;}
-.chat-settings-bar select,.chat-settings-bar input[type=range]{font-size:12px;}
-.chat-font-preview{font-size:11px;color:#aaa;margin-left:4px;}
-/* PROFILE */
-.profile-card{background:#fff;border:1px solid #e8e8e4;border-radius:14px;padding:28px;max-width:480px;}
-.profile-avatar-big{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin-bottom:16px;}
-/* ROLE CARD */
-.role-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:18px;margin-bottom:12px;}
+.chat-bubble-full{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.6;font-family:'Inter',system-ui,sans-serif;}
+.chat-msg-full.mine .chat-bubble-full{background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.chat-msg-full:not(.mine) .chat-bubble-full{background:#fff;border:1.5px solid var(--gray-200);color:var(--gray-900);border-bottom-left-radius:4px;}
+.chat-msg-meta{font-size:10px;color:var(--gray-400);margin-top:3px;font-weight:500;}
+.chat-date-sep{text-align:center;font-size:11px;color:var(--gray-400);padding:8px 0;font-weight:500;}
+.chat-mention-span{color:#A5B4FC;font-weight:600;}
+.chat-mine .chat-mention-span{color:#C7D2FE;}
+/* Chat input - BÜYÜK */
+.chat-input-row{padding:16px 20px;border-top:1px solid var(--gray-200);background:#fff;display:flex;gap:10px;align-items:flex-end;position:relative;}
+.chat-input-full{flex:1;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:14px;font-size:14px;font-family:'Inter',system-ui,sans-serif;color:var(--gray-900);resize:none;max-height:120px;outline:none;line-height:1.5;min-height:48px;transition:border-color 0.15s;}
+.chat-input-full:focus{border-color:var(--accent);}
+.chat-send-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.15s;}
+.chat-send-btn:hover{background:var(--accent-hover);}
+.chat-send-btn:active{transform:scale(0.95);}
+.chat-file-btn{width:44px;height:44px;border-radius:50%;background:var(--gray-100);border:1.5px solid var(--gray-200);color:var(--gray-500);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+/* Chat mention dropdown */
+.chat-mention-dd{position:absolute;bottom:76px;left:20px;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:0 8px 24px rgba(0,0,0,0.12);min-width:200px;max-height:200px;overflow-y:auto;z-index:50;display:none;}
+/* Chat settings */
+.chat-settings-bar{display:none;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--gray-200);background:var(--gray-50);flex-wrap:wrap;}
+.chat-settings-bar label{font-size:12px;color:var(--gray-500);font-weight:500;display:flex;align-items:center;gap:6px;}
+.chat-settings-bar select{font-size:12px;padding:3px 8px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-family:inherit;background:#fff;}
+
+/* MEETINGS */
+.meeting-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px;margin-bottom:10px;transition:all 0.15s;}
+.meeting-card:hover{border-color:var(--gray-300);}
+
+/* USERS TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{text-align:left;padding:10px 14px;font-size:11px;color:var(--gray-400);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1.5px solid var(--gray-200);}
+.data-table td{padding:12px 14px;border-bottom:1px solid var(--gray-100);vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--gray-50);}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;}
+.dot-online{background:#22c55e;}.dot-away{background:#f59e0b;}.dot-offline{background:var(--gray-300);}
+
+/* ROLES */
+.role-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;margin-bottom:12px;}
 .role-card-top{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
 .role-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
 .perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;}
-.perm-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8f8f4;border-radius:7px;font-size:12px;color:#555;}
-.data-table{width:100%;border-collapse:collapse;font-size:13px;}
-.data-table th{text-align:left;padding:10px 12px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e8e8e4;}
-.data-table td{padding:11px 12px;border-bottom:1px solid #f0f0ea;vertical-align:middle;}
-.data-table tr:last-child td{border-bottom:none;}
-.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;}
-.dot-online{background:#3B6D11;}.dot-away{background:#854F0B;}.dot-offline{background:#ccc;}
-.team-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:15px 16px;margin-bottom:9px;}
+.perm-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--gray-50);border-radius:var(--radius);font-size:12px;color:var(--gray-600);font-weight:500;}
+.toggle{width:38px;height:22px;border-radius:11px;border:none;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;}
+.toggle.on{background:var(--success);}.toggle.off{background:var(--gray-300);}
+.toggle::after{content:'';position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.toggle.on::after{left:19px;}.toggle.off::after{left:3px;}
+.perm-section-title{font-size:11px;color:var(--gray-400);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin:14px 0 8px;}
+.perm-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--gray-100);font-size:13px;color:var(--gray-700);}
+.perm-row:last-child{border-bottom:none;}
+
+/* TEAMS */
+.team-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px;margin-bottom:10px;}
 .team-members-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
-.team-member-tag{background:#f0f0ea;border-radius:20px;padding:2px 9px;font-size:12px;color:#555;}
-.meeting-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:15px 16px;margin-bottom:9px;}
-.meeting-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
-@media(max-width:680px){
-  .sidebar{width:100%;position:relative;height:auto;border-right:none;border-bottom:1px solid #e8e8e4;}
+.team-member-tag{background:var(--gray-100);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--gray-600);font-weight:500;}
+
+/* ARCHIVE */
+.archived-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:8px;opacity:0.75;}
+
+/* PROFILE */
+.profile-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:28px;max-width:480px;}
+
+/* MODALS */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:26px;width:500px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:18px;color:var(--gray-900);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+.btn-cancel{padding:9px 18px;border:1.5px solid var(--gray-200);border-radius:var(--radius);background:none;font-size:13px;cursor:pointer;color:var(--gray-500);font-family:inherit;font-weight:500;}
+.color-picker-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.12s;}
+.color-swatch.selected{border-color:var(--gray-900);transform:scale(1.1);}
+.checkbox-list{max-height:150px;overflow-y:auto;border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:6px;}
+.checkbox-list label{display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-radius:var(--radius);font-size:13px;}
+.checkbox-list label:hover{background:var(--gray-50);}
+.multi-person-select{border:1.5px solid var(--gray-200);border-radius:var(--radius);overflow:hidden;max-height:200px;overflow-y:auto;}
+.person-option{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--gray-100);transition:background 0.1s;}
+.person-option:last-child{border-bottom:none;}
+.person-option:hover{background:var(--gray-50);}
+.person-option.selected{background:var(--accent-light);}
+.person-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.person-name{font-size:13px;color:var(--gray-900);flex:1;font-weight:500;}
+.person-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--gray-300);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;transition:all 0.12s;}
+.person-check.checked{background:var(--accent);border-color:var(--accent);color:#fff;}
+/* TG INFO */
+.tg-info{background:#DBEAFE;border:1.5px solid #BFDBFE;border-radius:var(--radius);padding:12px 14px;font-size:12px;color:#1D4ED8;margin-bottom:14px;line-height:1.7;}
+.tg-info code{background:#fff;padding:2px 6px;border-radius:4px;font-size:11px;word-break:break-all;display:block;margin-top:4px;}
+.msg-preview{font-size:12px;color:var(--gray-600);background:var(--gray-50);padding:10px 12px;border-radius:var(--radius);margin-bottom:12px;line-height:1.6;white-space:pre-wrap;display:none;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gray-900);color:#fff;padding:12px 18px;border-radius:var(--radius-lg);font-size:13px;z-index:300;opacity:0;transition:opacity 0.2s;pointer-events:none;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.2);font-weight:500;}
+.toast.show{opacity:1;}
+
+/* MISC */
+.empty{text-align:center;padding:52px;color:var(--gray-400);font-size:14px;}
+.empty-icon{font-size:36px;margin-bottom:8px;}
+.highlight{background:#FEF08A;border-radius:2px;}
+.inline-form{display:flex;gap:6px;margin-top:6px;}
+.inline-input{flex:1;padding:7px 10px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:12px;font-family:inherit;color:var(--gray-900);min-width:0;outline:none;}
+.inline-input:focus{border-color:var(--accent);}
+.inline-btn{padding:7px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;}
+
+@media(max-width:768px){
+  :root{--sidebar-w:0px;}
+  .sidebar{width:100%;position:relative;height:auto;border-right:none;border-bottom:1px solid var(--gray-200);}
   .main{margin-left:0;padding:14px;}
   .app{flex-direction:column;}
   .stat-row{grid-template-columns:repeat(2,1fr);}
-  .task-detail{flex-direction:column;}
-  .task-detail-left{width:100%;border-right:none;border-bottom:1px solid #f0f0ea;}
-  .chat-sidebar{width:200px;}
   .dash-grid{grid-template-columns:1fr;}
+  .kanban-board{grid-template-columns:1fr;}
+  .chat-layout{flex-direction:column;height:auto;}
+  .chat-sidebar{width:100%;max-height:180px;border-right:none;border-bottom:1px solid var(--gray-200);}
+  .chat-messages{min-height:200px;}
+  .task-detail.show{display:block;}
 }
 </style>
 </head>
@@ -316,9 +415,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div id="auth-screen" class="auth-wrap" style="display:flex;">
   <div class="auth-box">
     <div class="auth-logo">Nexdo</div>
-    <div class="auth-sub">Ekibinizle görevlerinizi yönetin</div>
-    <div class="form-group"><label class="form-label">E-posta</label><input class="form-input" id="l-email" type="email" placeholder="ornek@sirket.com"/></div>
-    <div class="form-group"><label class="form-label">Şifre</label><input class="form-input" id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <div class="auth-sub">Smart Work Management</div>
+    <div class="form-group"><label class="form-label">E-posta</label><input class="form-input" id="l-email" type="email" placeholder="ornek@sirket.com" autocomplete="email"/></div>
+    <div class="form-group"><label class="form-label">Şifre</label><input class="form-input" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
     <label class="checkbox-row"><input type="checkbox" id="l-remember" checked/> Beni hatırla</label>
     <button class="btn-full" onclick="doLogin()">Giriş Yap</button>
     <div class="auth-msg" id="auth-msg"></div>
@@ -328,8 +427,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- CHANGE PASS -->
 <div id="change-pass-screen" class="change-pass-wrap" style="display:none;">
   <div class="change-pass-box">
-    <div class="auth-logo" style="margin-bottom:6px;">Nexdo</div>
-    <div style="font-size:13px;color:#888;margin-bottom:20px;">Lütfen şifrenizi değiştirin.</div>
+    <div class="auth-logo" style="margin-bottom:4px;">Nexdo</div>
+    <div class="auth-sub">Lütfen şifrenizi değiştirin</div>
     <div class="info-banner">Yönetici tarafından oluşturulan hesabınız için yeni bir şifre belirlemeniz gerekmektedir.</div>
     <div class="form-group"><label class="form-label">Yeni Şifre</label><input class="form-input" id="cp-pass1" type="password" placeholder="En az 6 karakter"/></div>
     <div class="form-group"><label class="form-label">Şifre Tekrar</label><input class="form-input" id="cp-pass2" type="password"/></div>
@@ -341,38 +440,52 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- APP -->
 <div id="app-screen" class="app" style="display:none;">
   <div class="sidebar">
-    <div class="sidebar-logo">Nexdo <div class="realtime-dot" id="rt-dot"></div></div>
-    <div class="nav-item" id="nav-tasks" onclick="toggleTaskMenu()">📋 Görevler <span id="task-menu-arrow" style="margin-left:auto;font-size:10px;transition:transform 0.2s;">▶</span></div>
-    <div id="task-submenu" style="display:none;padding-left:10px;margin-bottom:4px;">
-      <div class="nav-subitem" id="sub-all" onclick="showTaskStatus('all')">📋 Tümü</div>
+    <div class="sidebar-logo">Nexdo <div class="realtime-dot" id="rt-dot" style="display:none;"></div></div>
+
+    <div class="nav-item" id="nav-dashboard" onclick="showView('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+
+    <div class="nav-sep"></div>
+
+    <!-- Görevler açılır menü -->
+    <div class="nav-item" id="nav-tasks" onclick="toggleTaskMenu()"><span class="nav-icon">📋</span> Görevler <span class="nav-arrow" id="task-arrow">▶</span></div>
+    <div class="task-sub" id="task-submenu">
+      <div class="nav-subitem active-sub" id="sub-all" onclick="showTaskStatus('all')">📋 Tümü</div>
       <div class="nav-subitem" id="sub-beklemede" onclick="showTaskStatus('beklemede')">⏳ Beklemede</div>
       <div class="nav-subitem" id="sub-devam" onclick="showTaskStatus('devam')">🔄 Devam Ediyor</div>
       <div class="nav-subitem" id="sub-donus" onclick="showTaskStatus('donus')">↩ Dönüş Bekleniyor</div>
       <div class="nav-subitem" id="sub-tamamlandi" onclick="showTaskStatus('tamamlandi')">✅ Tamamlandı</div>
       <div class="nav-subitem" id="sub-iptal" onclick="showTaskStatus('iptal')">❌ İptal</div>
+      <div class="nav-subitem" id="sub-archive" onclick="showView('archive')">🗄 Arşiv</div>
     </div>
-    <div class="nav-item" id="nav-dashboard" onclick="showView('dashboard')">📊 Dashboard</div>
-    <div class="nav-item" id="nav-calendar" onclick="showView('calendar')">📅 Takvim</div>
-    <div class="nav-item" id="nav-chat" onclick="showView('chat')">💬 Chat <span class="nav-badge" id="chat-badge" style="display:none;">0</span></div>
-    <div class="nav-item" id="nav-meetings" onclick="showView('meetings')">📝 Toplantılar</div>
-    <div class="nav-item" id="nav-archive" onclick="showView('archive')">🗄 Arşiv</div>
-    <div class="sep"></div>
-    <div class="sidebar-section">Yönetim</div>
-    <div class="nav-item" id="nav-users" onclick="showView('users')">👥 Kullanıcılar</div>
-    <div class="nav-item" id="nav-roles" onclick="showView('roles')">🔐 Rol Tanımlama</div>
-    <div class="nav-item" id="nav-teams" onclick="showView('teams')">🏷 Ekipler</div>
+
+    <div class="nav-sep"></div>
+
+    <div class="nav-item" id="nav-calendar" onclick="showView('calendar')"><span class="nav-icon">📅</span> Takvim</div>
+    <div class="nav-item" id="nav-chat" onclick="showView('chat')"><span class="nav-icon">💬</span> Chat <span class="nav-badge" id="chat-badge" style="display:none;">!</span></div>
+    <div class="nav-item" id="nav-meetings" onclick="showView('meetings')"><span class="nav-icon">📝</span> Toplantılar</div>
+
+    <div class="nav-sep"></div>
+
+    <div class="nav-section">Yönetim</div>
+    <div class="nav-item" id="nav-users" onclick="showView('users')"><span class="nav-icon">👥</span> Kullanıcılar</div>
+    <div class="nav-item" id="nav-roles" onclick="showView('roles')"><span class="nav-icon">🔐</span> Roller</div>
+    <div class="nav-item" id="nav-teams" onclick="showView('teams')"><span class="nav-icon">🏷</span> Ekipler</div>
+
     <div class="user-block">
-      <div class="user-name" id="sb-name"></div>
-      <div class="user-email-small" id="sb-email"></div>
-      <div id="sb-role-badge" style="margin-bottom:8px;"></div>
-      <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Durumum</div>
-      <div class="status-pills">
-        <span class="status-pill" id="pill-online" onclick="setMyStatus('online')">🟢 Çevrimiçi</span>
-        <span class="status-pill" id="pill-away" onclick="setMyStatus('away')">🟡 Mola</span>
-        <span class="status-pill" id="pill-offline" onclick="setMyStatus('offline')">⚫ Çevrimdışı</span>
+      <div class="user-info-row">
+        <div class="user-av" id="sb-av">N</div>
+        <div class="user-details">
+          <div class="user-name" id="sb-name"></div>
+          <div class="user-role-label" id="sb-role-label"></div>
+        </div>
       </div>
-      <button class="btn-profile" onclick="showView('profile')">👤 Profilim</button>
-      <button class="btn-logout" onclick="doLogout()">Çıkış Yap</button>
+      <div class="status-pills">
+        <span class="status-pill" id="pill-online" onclick="setMyStatus('online')">🟢</span>
+        <span class="status-pill" id="pill-away" onclick="setMyStatus('away')">🟡</span>
+        <span class="status-pill" id="pill-offline" onclick="setMyStatus('offline')">⚫</span>
+      </div>
+      <button class="btn-sm" onclick="showView('profile')">👤 Profilim</button>
+      <button class="btn-sm" onclick="doLogout()" style="color:var(--danger);">Çıkış Yap</button>
       <div class="team-status-section">
         <div class="team-status-title">Ekip Durumu</div>
         <div class="team-status-list" id="team-status-list"></div>
@@ -381,10 +494,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <div class="main">
+    <!-- DASHBOARD -->
+    <div id="view-dashboard">
+      <div class="header"><h1>Dashboard</h1><button class="btn-secondary" onclick="renderDashboard()">↻ Yenile</button></div>
+      <div id="dashboard-content"></div>
+    </div>
+
     <!-- TASKS -->
-    <div id="view-tasks">
+    <div id="view-tasks" style="display:none;">
       <div class="header">
-        <h1>Görevler</h1>
+        <h1 id="tasks-page-title">Görevler</h1>
         <div class="header-actions">
           <div class="view-toggle">
             <button class="view-btn active" id="vbtn-list" onclick="setTaskView('list')">☰ Liste</button>
@@ -394,30 +513,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
       </div>
       <div class="stat-row">
-        <div class="stat-card" id="sc-total" onclick="setFilter('all',null)"><div class="stat-label">Toplam</div><div class="stat-val" id="s-total">—</div></div>
-        <div class="stat-card" id="sc-active" onclick="setFilter('devam',null)"><div class="stat-label">Devam Ediyor</div><div class="stat-val" id="s-active">—</div></div>
-        <div class="stat-card" id="sc-urgent" onclick="setFilter('urgent',null)"><div class="stat-label">Yaklaşan Deadline</div><div class="stat-val" id="s-urgent" style="color:#A32D2D;">—</div></div>
-        <div class="stat-card" id="sc-done" onclick="setFilter('tamamlandi',null)"><div class="stat-label">Tamamlanan</div><div class="stat-val" id="s-done">—</div></div>
+        <div class="stat-card" id="sc-total" onclick="showTaskStatus('all')"><div class="stat-label">Toplam Aktif</div><div class="stat-val" id="s-total">—</div></div>
+        <div class="stat-card" id="sc-active" onclick="showTaskStatus('devam')"><div class="stat-label">Devam Ediyor</div><div class="stat-val" id="s-active">—</div></div>
+        <div class="stat-card" id="sc-urgent" onclick="showTaskStatus('urgent')"><div class="stat-label">Deadline Yakın</div><div class="stat-val" id="s-urgent" style="color:var(--danger);">—</div></div>
+        <div class="stat-card" id="sc-done" onclick="showTaskStatus('tamamlandi')"><div class="stat-label">Tamamlanan</div><div class="stat-val" id="s-done">—</div></div>
       </div>
-      <div class="search-bar"><input class="search-input" id="task-search" placeholder="Görev ara..." oninput="renderTasks()"/></div>
-      <div class="filters">
-        <button class="filter-btn active" onclick="setFilter('all',this)">Tümü</button>
-        <button class="filter-btn" onclick="setFilter('acil',this)">🔴 Acil</button>
-        <button class="filter-btn" onclick="setFilter('orta',this)">🟡 Orta</button>
-        <button class="filter-btn" onclick="setFilter('dusuk',this)">🟢 Düşük</button>
-        <button class="filter-btn" onclick="setFilter('beklemede',this)">⏳ Beklemede</button>
-        <button class="filter-btn" onclick="setFilter('devam',this)">🔄 Devam</button>
-        <button class="filter-btn" onclick="setFilter('donus',this)">↩ Dönüş Bekleniyor</button>
-      </div>
+      <div class="search-bar"><input class="search-input" id="task-search" placeholder="Görev ara..." oninput="renderCurrentTaskView()"/></div>
       <div id="task-list"></div>
       <div id="task-kanban" style="display:none;"></div>
       <div id="task-pagination"></div>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div id="view-dashboard" style="display:none;">
-      <div class="header"><h1>Dashboard</h1><button class="btn-secondary" onclick="renderDashboard()">↻ Yenile</button></div>
-      <div id="dashboard-content"></div>
     </div>
 
     <!-- CALENDAR -->
@@ -431,56 +535,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="header"><h1>Chat</h1><button class="btn-primary" onclick="openModal('newChannelModal')">+ Yeni Kanal</button></div>
       <div class="chat-layout">
         <div class="chat-sidebar">
-          <div class="chat-sidebar-header">
-            <span>Kanallar</span>
-          </div>
-          <div class="chat-channel-list" id="channel-list"></div>
-          <div style="padding:8px;border-top:1px solid #e8e8e4;">
-            <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;padding:0 4px;">Direkt Mesaj</div>
+          <div class="chat-sidebar-header"><span># Kanallar</span></div>
+          <div class="chat-ch-list" id="channel-list"></div>
+          <div style="padding:8px;border-top:1px solid var(--gray-200);">
+            <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.8px;padding:0 4px;margin-bottom:4px;">Direkt Mesaj</div>
             <div id="dm-list"></div>
           </div>
         </div>
         <div class="chat-main">
           <div class="chat-main-header">
-            <div style="flex:1;">
-              <div class="chat-main-title" id="chat-channel-name">Kanal seçin</div>
-              <div class="chat-main-sub" id="chat-channel-sub"></div>
-            </div>
-            <button class="icon-btn" onclick="toggleChatSettings()" title="Görünüm Ayarları">⚙ Yazı Ayarları</button>
+            <div class="chat-main-title" id="chat-channel-name">Kanal seçin</div>
+            <button class="icon-btn" onclick="toggleChatSettings()">⚙ Yazı</button>
           </div>
-          <div class="chat-settings-bar" id="chat-settings-bar" style="display:none;">
-          <label>Yazı Tipi:
-            <select id="chat-font-select" onchange="applyChatFont()" style="margin-left:4px;padding:2px 6px;border:1px solid #ddd;border-radius:5px;font-size:12px;">
-              <option value="system-ui,-apple-system">Sistem (Varsayılan)</option>
-              <option value="Georgia,serif">Georgia (Serif)</option>
-              <option value="'Courier New',monospace">Courier (Mono)</option>
-              <option value="Arial,sans-serif">Arial</option>
-              <option value="'Times New Roman',serif">Times New Roman</option>
-            </select>
-          </label>
-          <label>Boyut:
-            <input type="range" id="chat-font-size" min="11" max="18" value="13" oninput="applyChatFont()" style="width:80px;margin:0 4px;">
-            <span class="chat-font-preview" id="chat-font-size-label">13px</span>
-          </label>
-          <label>Renk:
-            <input type="color" id="chat-font-color-mine" value="#ffffff" oninput="applyChatFont()" title="Kendi mesaj rengi" style="width:28px;height:24px;border:none;cursor:pointer;border-radius:4px;">
-            <span style="font-size:11px;color:#aaa;">Benim</span>
-          </label>
-          <label>
-            <input type="color" id="chat-font-color-other" value="#1a1a1a" oninput="applyChatFont()" title="Diğer mesaj rengi" style="width:28px;height:24px;border:none;cursor:pointer;border-radius:4px;">
-            <span style="font-size:11px;color:#aaa;">Diğerleri</span>
-          </label>
-        </div>
-        <div class="chat-messages" id="chat-messages"></div>
-          <div class="chat-input-row" id="chat-input-area" style="display:none;">
+          <div class="chat-settings-bar" id="chat-settings-bar">
+            <label>Yazı Tipi:
+              <select id="chat-font-select" onchange="applyChatFont()" style="margin-left:4px;">
+                <option value="'Inter',system-ui,sans-serif">Inter (Varsayılan)</option>
+                <option value="Georgia,serif">Georgia</option>
+                <option value="'Courier New',monospace">Courier</option>
+                <option value="Arial,sans-serif">Arial</option>
+              </select>
+            </label>
+            <label>Boyut: <input type="range" id="chat-font-size" min="12" max="18" value="13" oninput="applyChatFont()" style="width:70px;"> <span id="chat-font-size-label">13px</span></label>
+            <label>Renk benim: <input type="color" id="chat-color-mine" value="#ffffff" oninput="applyChatFont()"></label>
+            <label>Diğerleri: <input type="color" id="chat-color-other" value="#111827" oninput="applyChatFont()"></label>
+          </div>
+          <div class="chat-messages" id="chat-messages"><div style="text-align:center;color:var(--gray-400);padding:40px;">Sol taraftan bir kanal seçin</div></div>
+          <div id="chat-file-preview" style="padding:0 20px 6px;font-size:12px;color:var(--gray-400);display:none;"></div>
+          <div class="chat-input-row" id="chat-input-area" style="display:none;position:relative;">
             <div style="flex:1;position:relative;">
               <textarea class="chat-input-full" id="chat-input" placeholder="Mesaj yaz... @ ile kişi etiketle" rows="1" onkeydown="chatKeyDown(event)" onkeyup="handleChatMention(event)"></textarea>
-              <div class="mention-dropdown" id="chat-mention-dd"></div>
+              <div class="chat-mention-dd" id="chat-mention-dd"></div>
             </div>
-            <label class="chat-file-btn" title="Dosya ekle">📎<input type="file" id="chat-file-input" style="display:none;" onchange="setChatFile(this)"/></label>
-            <button class="chat-send" onclick="sendChatMessage()">↑</button>
+            <label class="chat-file-btn"><input type="file" id="chat-file-input" style="display:none;" onchange="setChatFile(this)"/>📎</label>
+            <button class="chat-send-btn" onclick="sendChatMessage()" type="button">↑</button>
           </div>
-          <div id="chat-file-preview" style="padding:0 20px 8px;font-size:11px;color:#888;display:none;"></div>
         </div>
       </div>
     </div>
@@ -494,14 +583,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <!-- ARCHIVE -->
     <div id="view-archive" style="display:none;">
-      <div class="header"><h1>🗄 Pasif Görevler</h1><button class="btn-secondary" onclick="loadArchive()">↻ Yenile</button></div>
-      <div style="font-size:13px;color:#888;margin-bottom:16px;">Arşivlenen, iptal edilen ve süresi geçmiş görevler burada listelenir.</div>
+      <div class="header"><h1>🗄 Arşiv</h1><button class="btn-secondary" onclick="loadArchive()">↻ Yenile</button></div>
+      <div style="font-size:13px;color:var(--gray-400);margin-bottom:16px;">Arşivlenen, iptal edilen görevler burada.</div>
       <div id="archive-list"></div>
     </div>
 
     <!-- USERS -->
     <div id="view-users" style="display:none;">
-      <div class="header"><h1>Kullanıcılar</h1><div class="header-actions"><button class="btn-secondary" onclick="loadProfiles()">↻ Yenile</button><button class="btn-primary" id="btn-add-user" onclick="openModal('addUserModal')">+ Kullanıcı Ekle</button></div></div>
+      <div class="header"><h1>Kullanıcılar</h1><div class="header-actions"><button class="btn-secondary" onclick="loadProfiles()">↻</button><button class="btn-primary" id="btn-add-user" onclick="openModal('addUserModal')">+ Kullanıcı Ekle</button></div></div>
       <div class="search-bar"><input class="search-input" id="user-search" placeholder="Kullanıcı ara..." oninput="renderUsers()"/></div>
       <div id="user-list"></div>
     </div>
@@ -522,15 +611,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="view-profile" style="display:none;">
       <div class="header"><h1>Profilim</h1></div>
       <div class="profile-card">
-        <div class="profile-avatar-big" id="profile-avatar"></div>
-        <div style="font-size:18px;font-weight:600;margin-bottom:4px;" id="profile-name-display"></div>
-        <div style="font-size:13px;color:#888;margin-bottom:6px;" id="profile-email-display"></div>
+        <div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin-bottom:14px;background:var(--accent-light);color:var(--accent);" id="profile-avatar"></div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:3px;" id="profile-name-display"></div>
+        <div style="font-size:13px;color:var(--gray-400);margin-bottom:6px;" id="profile-email-display"></div>
         <div id="profile-role-badge" style="margin-bottom:20px;"></div>
-        <div style="height:1px;background:#e8e8e4;margin-bottom:20px;"></div>
+        <div style="height:1px;background:var(--gray-200);margin-bottom:20px;"></div>
         <div class="form-group"><label class="form-label">Ad Soyad</label><input class="form-input" id="profile-name-input"/></div>
         <button class="btn-primary" style="width:100%;margin-bottom:20px;" onclick="updateProfile()">Bilgilerimi Kaydet</button>
-        <div style="height:1px;background:#e8e8e4;margin-bottom:20px;"></div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:14px;">Şifre Değiştir</div>
+        <div style="height:1px;background:var(--gray-200);margin-bottom:20px;"></div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px;">Şifre Değiştir</div>
         <div class="form-group"><label class="form-label">Yeni Şifre</label><input class="form-input" id="profile-pass1" type="password" placeholder="En az 6 karakter"/></div>
         <div class="form-group"><label class="form-label">Şifre Tekrar</label><input class="form-input" id="profile-pass2" type="password"/></div>
         <button class="btn-primary" style="width:100%;" onclick="updatePassword()">Şifremi Değiştir</button>
@@ -565,11 +654,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </select>
     </div>
     <div class="form-group" id="f-team-group" style="display:none;"><label class="form-label">Ekip</label><select class="form-input" id="f-team"><option value="">Ekip seçin...</option></select></div>
-    <div class="form-group"><label class="form-label">Kişi Ata <span style="color:#888;font-size:11px;">(birden fazla seçilebilir)</span></label><div class="multi-person-select" id="f-persons-list"></div></div>
+    <div class="form-group"><label class="form-label">Kişi Ata</label><div class="multi-person-select" id="f-persons-list"></div></div>
     <div class="form-group"><label class="form-label">Not</label><textarea class="form-input" id="f-note" rows="2" placeholder="Açıklama..."></textarea></div>
     <div class="form-group">
-      <label class="form-label">Dosya Ekle <span style="color:#888;font-size:11px;">(max 10MB)</span></label>
-      <label class="file-input-label">📎 Dosya seç<input type="file" id="f-file" style="display:none;" multiple onchange="previewFiles(this)"/></label>
+      <label class="form-label">Dosya Ekle <span style="color:var(--gray-400);font-size:11px;">(max 10MB)</span></label>
+      <label class="file-add-btn">📎 Seç<input type="file" id="f-file" style="display:none;" multiple onchange="previewFiles(this)"/></label>
       <div id="f-file-list" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;"></div>
     </div>
     <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('taskModal')">İptal</button><button class="btn-primary" onclick="addTask()">Ekle</button></div>
@@ -607,13 +696,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="form-group"><label class="form-label">Rol Adı</label><input class="form-input" id="rc-name" placeholder="Örn: Proje Müdürü"/></div>
     <div class="form-group"><label class="form-label">Renk</label>
       <div class="color-picker-row">
-        <div class="color-swatch selected" style="background:#A32D2D" data-color="#A32D2D" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#3B6D11" data-color="#3B6D11" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#185FA5" data-color="#185FA5" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#854F0B" data-color="#854F0B" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#3C3489" data-color="#3C3489" onclick="selectColor(this)"></div>
+        <div class="color-swatch selected" style="background:#B91C1C" data-color="#B91C1C" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#2D7A3A" data-color="#2D7A3A" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#5B5FEF" data-color="#5B5FEF" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#92400E" data-color="#92400E" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#1D4ED8" data-color="#1D4ED8" onclick="selectColor(this)"></div>
         <div class="color-swatch" style="background:#0F6E56" data-color="#0F6E56" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#5F5E5A" data-color="#5F5E5A" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#374151" data-color="#374151" onclick="selectColor(this)"></div>
       </div>
     </div>
     <div class="form-group"><label class="form-label">Yetkiler</label>
@@ -629,9 +718,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="perm-row"><span>Toplantı silme</span><button class="toggle off" id="perm-meeting_delete" onclick="togglePerm(this)"></button></div>
       <div class="perm-section-title">Yönetim</div>
       <div class="perm-row"><span>Ekip yönetimi</span><button class="toggle off" id="perm-team_manage" onclick="togglePerm(this)"></button></div>
-      <div class="perm-row"><span>Kullanıcı rol yönetimi</span><button class="toggle off" id="perm-user_manage" onclick="togglePerm(this)"></button></div>
+      <div class="perm-row"><span>Kullanıcı yönetimi</span><button class="toggle off" id="perm-user_manage" onclick="togglePerm(this)"></button></div>
       <div class="perm-row"><span>Rol yönetimi</span><button class="toggle off" id="perm-role_manage" onclick="togglePerm(this)"></button></div>
-      <div class="perm-row"><span>Yeni kullanıcı ekleme</span><button class="toggle off" id="perm-user_invite" onclick="togglePerm(this)"></button></div>
+      <div class="perm-row"><span>Kullanıcı ekleme</span><button class="toggle off" id="perm-user_invite" onclick="togglePerm(this)"></button></div>
       <div class="perm-section-title">Diğer</div>
       <div class="perm-row"><span>Telegram bildirimi</span><button class="toggle off" id="perm-telegram_send" onclick="togglePerm(this)"></button></div>
       <div class="perm-row"><span>AI araştır</span><button class="toggle off" id="perm-ai_research" onclick="togglePerm(this)"></button></div>
@@ -652,7 +741,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="form-group"><label class="form-label">E-posta</label><input class="form-input" id="au-email" type="email" placeholder="ornek@sirket.com"/></div>
     <div class="form-group"><label class="form-label">Rol</label><select class="form-input" id="au-role"></select></div>
     <div class="form-group"><label class="form-label">Geçici Şifre</label><input class="form-input" id="au-pass" type="password" placeholder="En az 6 karakter"/></div>
-    <div style="background:#FAEEDA;border:1px solid #FAC775;border-radius:8px;padding:10px 12px;font-size:12px;color:#854F0B;">Kullanıcı ilk girişte şifresini değiştirmek zorunda kalacak.</div>
+    <div style="background:var(--warning-light);border:1px solid #FDE68A;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--warning);margin-top:4px;">İlk girişte şifre değiştirmesi istenecek.</div>
     <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('addUserModal')">İptal</button><button class="btn-primary" onclick="addUser()">Ekle</button></div>
   </div>
 </div>
@@ -662,7 +751,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="modal">
     <h2>Rol Ata</h2>
     <input type="hidden" id="ar-uid"/>
-    <div class="form-group"><label class="form-label">Kullanıcı</label><div style="padding:9px 12px;background:#f8f8f4;border-radius:8px;font-size:13px;color:#555;" id="ar-uname"></div></div>
+    <div class="form-group"><label class="form-label">Kullanıcı</label><div style="padding:9px 12px;background:var(--gray-50);border-radius:var(--radius);font-size:13px;color:var(--gray-500);" id="ar-uname"></div></div>
     <div class="form-group"><label class="form-label">Rol</label><select class="form-input" id="ar-role-select"></select></div>
     <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('assignRoleModal')">İptal</button><button class="btn-primary" onclick="assignRole()">Kaydet</button></div>
   </div>
@@ -682,7 +771,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="modal-overlay" id="tgModal">
   <div class="modal">
     <h2>✈ Telegram'a Gönder</h2>
-    <div class="tg-info">Chat ID'nizi bir kez girin, tarayıcı hatırlar.<br><br><b>Chat ID nasıl öğrenilir?</b> Botunuzu bulun, <b>/start</b> yazın, sonra:<br><code>https://api.telegram.org/bot8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs/getUpdates</code></div>
+    <div class="tg-info">Chat ID'nizi bir kez girin, tarayıcı hatırlar.<br><b>Chat ID:</b> Botunuzu bulun, /start yazın, sonra:<br><code>https://api.telegram.org/bot8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs/getUpdates</code></div>
     <div class="form-group"><label class="form-label">Telegram Chat ID</label><input class="form-input" id="tg-chat-input" placeholder="Örn: 933023424"/></div>
     <div class="msg-preview" id="tg-msg-preview"></div>
     <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('tgModal')">İptal</button><button class="btn-primary" onclick="confirmSendTelegram()">Gönder</button></div>
@@ -696,16 +785,20 @@ const SB_URL='https://cvgxwpxvtxedajzrnand.supabase.co';
 const SB_KEY='sb_publishable_cJp6p5cSfJwOynI5kCK_2Q_EPP4bijp';
 const TG_TOKEN='8632000680:AAGZ_vVX8KJCsU7obXp63zgcNYmk4_5JNTs';
 const STATUS_MAP={beklemede:{l:'⏳ Beklemede',c:'badge-gray'},devam:{l:'🔄 Devam Ediyor',c:'badge-blue'},donus:{l:'↩ Dönüş Bekleniyor',c:'badge-amber'},tamamlandi:{l:'✅ Tamamlandı',c:'badge-green'},iptal:{l:'❌ İptal',c:'badge-red'}};
-const ACTIVE_STATUSES=['beklemede','devam','donus'];
+const ACTIVE=['beklemede','devam','donus'];
 const PERM_KEYS=['task_create','task_edit_own','task_edit_all','task_archive','task_status_change','task_assign','meeting_create','meeting_delete','team_manage','user_manage','role_manage','user_invite','telegram_send','ai_research','file_upload'];
-const PERM_LABELS={task_create:'Görev oluşturma',task_edit_own:'Kendi görevini düzenleme',task_edit_all:'Herkesnin görevini düzenleme',task_archive:'Görevi arşivleme',task_status_change:'Durum değiştirme',task_assign:'Kişi atama',meeting_create:'Toplantı oluşturma',meeting_delete:'Toplantı silme',team_manage:'Ekip yönetimi',user_manage:'Kullanıcı rol yönetimi',role_manage:'Rol yönetimi',user_invite:'Yeni kullanıcı ekleme',telegram_send:'Telegram bildirimi',ai_research:'AI araştır',file_upload:'Dosya yükleme'};
-const AVATAR_COLORS=['#EEEDFE','#E1F5EE','#FAEEDA','#FAECE7','#E6F1FB'];
-const AVATAR_TEXT=['#3C3489','#0F6E56','#854F0B','#993C1D','#185FA5'];
+const PERM_LABELS={task_create:'Görev oluşturma',task_edit_own:'Kendi görevini düzenleme',task_edit_all:'Herkesnin görevini düzenleme',task_archive:'Görevi arşivleme',task_status_change:'Durum değiştirme',task_assign:'Kişi atama',meeting_create:'Toplantı oluşturma',meeting_delete:'Toplantı silme',team_manage:'Ekip yönetimi',user_manage:'Kullanıcı yönetimi',role_manage:'Rol yönetimi',user_invite:'Kullanıcı ekleme',telegram_send:'Telegram bildirimi',ai_research:'AI araştır',file_upload:'Dosya yükleme'};
+const AVC=['#EEF2FF','#F0FDF4','#FFFBEB','#FFF1F2','#EFF6FF'];
+const AVT=['#4338CA','#166534','#92400E','#9F1239','#1D4ED8'];
 const PAGE_SIZE=15;
 
-let sb,me=null,myProfile=null,myPerms={},tasks=[],meetings=[],comments={},assignees={},profiles=[],teams=[],roles=[],channels=[],chatMessages=[],currentChannel=null,currentFilter='all',expandedId=null,pendingTgMsg=null,selectedFiles=[],commentFiles={},chatFile=null,selectedColor='#A32D2D',statusInterval=null,realtimeChannel=null,chatChannel=null,taskView='list',currentPage=1,calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+let sb,me=null,myProfile=null,myPerms={},tasks=[],meetings=[],comments={},assignees={},profiles=[],teams=[],roles=[],channels=[],chatMessages=[],currentChannel=null,currentFilter='all',currentTaskStatus='all',expandedId=null,pendingTgMsg=null,selectedFiles=[],commentFiles={},chatFile=null,selectedColor='#B91C1C',statusInterval=null,realtimeChannel=null,chatRealtime=null,taskMenuOpen=false,taskView='list',currentPage=1,calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+let lastChatCount=0,audioCtx=null;
+let chatFontSettings=JSON.parse(localStorage.getItem('nexdo_chat_font')||'{"font":"\'Inter\',system-ui,sans-serif","size":13,"mine":"#ffffff","other":"#111827"}');
 
 function can(p){return myPerms[p]===true;}
+function avStyle(name,idx){const i=(idx||0)%5;return `background:${AVC[i]};color:${AVT[i]}`;}
+function avInitial(s){return ((s||'?')[0]).toUpperCase();}
 
 async function init(){
   sb=supabase.createClient(SB_URL,SB_KEY);
@@ -718,58 +811,60 @@ async function init(){
   });
 }
 
-function cleanup(){
-  if(statusInterval)clearInterval(statusInterval);
-  if(realtimeChannel)sb.removeChannel(realtimeChannel);
-  if(chatChannel)sb.removeChannel(chatChannel);
-}
-
 function showScreen(s){
   document.getElementById('auth-screen').style.display=s==='auth'?'flex':'none';
   document.getElementById('change-pass-screen').style.display=s==='change-pass'?'flex':'none';
   document.getElementById('app-screen').style.display=s==='app'?'flex':'none';
 }
 
+function cleanup(){
+  if(statusInterval)clearInterval(statusInterval);
+  if(realtimeChannel)sb.removeChannel(realtimeChannel);
+  if(chatRealtime)sb.removeChannel(chatRealtime);
+}
+
 async function afterLogin(){
   await loadRoles();
-  let {data:profile}=await sb.from('profiles').select('*').eq('id',me.id).single();
-  if(!profile){
+  let {data:p}=await sb.from('profiles').select('*').eq('id',me.id).single();
+  if(!p){
     await sb.from('profiles').insert({id:me.id,full_name:me.email.split('@')[0],email:me.email,status:'online',last_seen:new Date().toISOString(),must_change_password:false});
-    const r=await sb.from('profiles').select('*').eq('id',me.id).single();profile=r.data;
+    const r=await sb.from('profiles').select('*').eq('id',me.id).single();p=r.data;
   }
-  myProfile=profile;
+  myProfile=p;
   if(myProfile.must_change_password){showScreen('change-pass');return;}
   await sb.from('profiles').update({status:'online',last_seen:new Date().toISOString(),email:me.email}).eq('id',me.id);
   myProfile.status='online';myProfile.email=me.email;
   if(myProfile.role_id){const role=roles.find(r=>r.id===myProfile.role_id);myPerms=role?.permissions||{};}
-  else{PERM_KEYS.forEach(k=>myPerms[k]=true);}
+  else PERM_KEYS.forEach(k=>myPerms[k]=true);
   setupSidebar();
   await Promise.all([loadTasks(),loadMeetings(),loadProfiles(),loadTeams(),loadChannels()]);
   setupRealtime();
   showScreen('app');
   showView('dashboard');
+  applyChatFont();
   if(statusInterval)clearInterval(statusInterval);
   statusInterval=setInterval(()=>sb.from('profiles').update({last_seen:new Date().toISOString()}).eq('id',me.id),30000);
 }
 
 function setupSidebar(){
-  document.getElementById('sb-name').textContent=myProfile.full_name||me.email;
-  document.getElementById('sb-email').textContent=me.email;
+  const n=myProfile.full_name||me.email;
+  document.getElementById('sb-name').textContent=n;
+  document.getElementById('sb-av').textContent=avInitial(n);
   const roleObj=roles.find(r=>r.id===myProfile.role_id);
-  if(roleObj)document.getElementById('sb-role-badge').innerHTML=`<span style="background:${roleObj.color}22;color:${roleObj.color};padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;">${roleObj.name}</span>`;
+  document.getElementById('sb-role-label').textContent=roleObj?.name||'Kullanıcı';
+  if(roleObj)document.getElementById('sb-role-label').style.color=roleObj.color;
   updateStatusPills('online');
   if(!can('task_create')){const b=document.getElementById('btn-new-task');if(b)b.style.display='none';}
   if(!can('meeting_create')){const b=document.getElementById('btn-new-meeting');if(b)b.style.display='none';}
   if(!can('user_invite')){const b=document.getElementById('btn-add-user');if(b)b.style.display='none';}
-  renderTeamStatus();
 }
 
 function setupRealtime(){
   if(realtimeChannel)sb.removeChannel(realtimeChannel);
-  realtimeChannel=sb.channel('app')
-    .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},async()=>{await loadTasks();})
-    .on('postgres_changes',{event:'*',schema:'public',table:'comments'},async()=>{await loadTasks();})
-    .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},async()=>{await loadProfiles();renderTeamStatus();})
+  realtimeChannel=sb.channel('app-rt')
+    .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks())
+    .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>loadTasks())
+    .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},()=>loadProfiles())
     .subscribe(s=>{const d=document.getElementById('rt-dot');if(d)d.style.display=s==='SUBSCRIBED'?'inline-block':'none';});
 }
 
@@ -781,7 +876,6 @@ async function doChangePassword(){
   const {error}=await sb.auth.updateUser({password:p1});
   if(error){msg.className='auth-msg err';msg.textContent=error.message;return;}
   await sb.from('profiles').update({must_change_password:false}).eq('id',me.id);
-  myProfile.must_change_password=false;
   msg.className='auth-msg ok';msg.textContent='Şifre değiştirildi!';
   setTimeout(()=>afterLogin(),1000);
 }
@@ -801,50 +895,49 @@ async function doLogout(){
 
 async function setMyStatus(s){
   await sb.from('profiles').update({status:s,last_seen:new Date().toISOString()}).eq('id',me.id);
-  myProfile.status=s;updateStatusPills(s);
-  showToast({online:'🟢 Çevrimiçi oldunuz',away:'🟡 Mola moduna geçtiniz',offline:'⚫ Çevrimdışı oldunuz'}[s]);
+  myProfile.status=s;updateStatusPills(s);renderTeamStatus();
+  showToast({online:'🟢 Çevrimiçi',away:'🟡 Mola',offline:'⚫ Çevrimdışı'}[s],'ok');
 }
-function updateStatusPills(s){['online','away','offline'].forEach(k=>{const el=document.getElementById('pill-'+k);if(el)el.className='status-pill'+(s===k?' pill-'+k:'');});}
+
+function updateStatusPills(s){
+  ['online','away','offline'].forEach(k=>{
+    const el=document.getElementById('pill-'+k);
+    if(!el)return;
+    el.className='status-pill';
+    if(s===k)el.classList.add('pill-'+k);
+  });
+}
 
 async function loadRoles(){const {data}=await sb.from('roles').select('*').order('created_at',{ascending:true});roles=data||[];}
-
 async function loadTasks(){
-  const {data}=await sb.from('tasks').select('*').order('created_at',{ascending:false});
-  tasks=data||[];
+  const {data}=await sb.from('tasks').select('*').order('created_at',{ascending:false});tasks=data||[];
   const {data:cd}=await sb.from('comments').select('*').order('created_at',{ascending:true});
   comments={};(cd||[]).forEach(c=>{if(!comments[c.task_id])comments[c.task_id]=[];comments[c.task_id].push(c);});
   const {data:ad}=await sb.from('task_assignees').select('*');
   assignees={};(ad||[]).forEach(a=>{if(!assignees[a.task_id])assignees[a.task_id]=[];assignees[a.task_id].push(a.user_email);});
-  renderTasks();
+  renderCurrentTaskView();
 }
-
 async function loadMeetings(){const {data}=await sb.from('meetings').select('*').order('created_at',{ascending:false});meetings=data||[];renderMeetings();}
-async function loadProfiles(){const {data}=await sb.from('profiles').select('*');profiles=data||[];const cv=document.querySelector('.nav-item.active')?.id?.replace('nav-','');if(cv==='users')renderUsers();renderTeamStatus();}
+async function loadProfiles(){
+  const {data}=await sb.from('profiles').select('*');profiles=data||[];
+  renderTeamStatus();
+  const cv=document.querySelector('.nav-item.active')?.id?.replace('nav-','');
+  if(cv==='users')renderUsers();
+}
 async function loadTeams(){
   const {data}=await sb.from('teams').select('*').order('created_at',{ascending:false});teams=data||[];renderTeams();
-  const sel=document.getElementById('f-team');sel.innerHTML='<option value="">Ekip seçin...</option>';teams.forEach(t=>sel.innerHTML+=`<option value="${t.id}">${t.name}</option>`);
+  const sel=document.getElementById('f-team');sel.innerHTML='<option value="">Ekip seçin...</option>';
+  teams.forEach(t=>sel.innerHTML+=`<option value="${t.id}">${t.name}</option>`);
 }
-
 async function loadChannels(){
   const {data}=await sb.from('chat_channels').select('*').order('created_at',{ascending:true});
   channels=data||[];renderChannelList();
 }
-
 async function loadArchive(){
   const {data}=await sb.from('tasks').select('*').or('archived.eq.true,status.eq.iptal').order('created_at',{ascending:false});
-  const archivedTasks=data||[];
   const el=document.getElementById('archive-list');
-  if(!archivedTasks.length){el.innerHTML='<div class="empty"><div class="empty-icon">🗄</div>Arşivde görev yok</div>';return;}
-  el.innerHTML=archivedTasks.map(t=>`
-    <div class="archived-task">
-      <div class="archived-task-title">${t.title}</div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        ${pBadge(t.priority)}${sBadge(t.status||'beklemede')}
-        ${t.archived?'<span class="badge badge-gray">🗄 Arşivlendi</span>':''}
-        ${t.deadline?`<span style="font-size:12px;color:#aaa;">📅 ${fmtDate(t.deadline)}</span>`:''}
-        <button class="icon-btn" style="font-size:11px;margin-left:auto;" onclick="restoreTask('${t.id}')">↩ Geri Al</button>
-      </div>
-    </div>`).join('');
+  if(!data?.length){el.innerHTML='<div class="empty"><div class="empty-icon">🗄</div>Arşiv boş</div>';return;}
+  el.innerHTML=data.map(t=>`<div class="archived-card"><div style="font-size:13px;font-weight:600;color:var(--gray-500);text-decoration:line-through;margin-bottom:5px;">${t.title}</div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${pBadge(t.priority)}${sBadge(t.status)}${t.archived?'<span class="badge badge-gray">🗄 Arşiv</span>':''}${t.deadline?`<span style="font-size:11px;color:var(--gray-400);">📅 ${fmtDate(t.deadline)}</span>`:''}${can('task_archive')?`<button class="icon-btn" style="margin-left:auto;font-size:11px;" onclick="restoreTask('${t.id}')">↩ Geri Al</button>`:''}</div></div>`).join('');
 }
 
 // UTILS
@@ -854,18 +947,50 @@ function fmtDT(ds){if(!ds)return '';return new Date(ds).toLocaleDateString('tr-T
 function fmtTime(ds){if(!ds)return '';return new Date(ds).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
 function pBadge(p){if(p==='acil')return '<span class="badge badge-red">🔴 Acil</span>';if(p==='orta')return '<span class="badge badge-amber">🟡 Orta</span>';return '<span class="badge badge-green">🟢 Düşük</span>';}
 function sBadge(s){const st=STATUS_MAP[s]||STATUS_MAP.beklemede;return `<span class="badge ${st.c}">${st.l}</span>`;}
-function dlLabel(dl){if(!dl)return '';const d=dayDiff(dl);if(d<0)return `<span class="deadline urgent">⚠ ${Math.abs(d)} gün geçti</span>`;if(d<=3)return `<span class="deadline urgent">⏰ ${d} gün kaldı (${fmtDate(dl)})</span>`;return `<span class="deadline">📅 ${fmtDate(dl)}</span>`;}
-function statusIcon(s){if(s==='online')return '<span class="status-dot dot-online"></span>Çevrimiçi';if(s==='away')return '<span class="status-dot dot-away"></span>Mola';return '<span class="status-dot dot-offline"></span>Çevrimdışı';}
-function avStyle(name,idx){const i=(idx||0)%5;return `background:${AVATAR_COLORS[i]};color:${AVATAR_TEXT[i]}`;}
-function avInitial(name){return (name||'?')[0].toUpperCase();}
-function renderMentions(t){return (t||'').replace(/@(\S+)/g,'<span class="chat-mention">@$1</span>');}
+function dlLabel(dl){if(!dl)return '';const d=dayDiff(dl);if(d<0)return `<span class="deadline urgent">⚠ ${Math.abs(d)} gün geçti</span>`;if(d<=3)return `<span class="deadline urgent">⏰ ${d} gün kaldı</span>`;return `<span class="deadline">📅 ${fmtDate(dl)}</span>`;}
+function statusIconHtml(s){if(s==='online')return '<span class="status-dot dot-online"></span>Çevrimiçi';if(s==='away')return '<span class="status-dot dot-away"></span>Mola';return '<span class="status-dot dot-offline"></span>Çevrimdışı';}
+function renderMentions(t,isMine){return (t||'').replace(/@(\S+)/g,`<span class="${isMine?'comment-item mine .comment-mention':''}" style="color:${isMine?'#C7D2FE':'#4338CA'};font-weight:600;">@$1</span>`);}
 function highlight(text,q){if(!q)return text;const r=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return text.replace(r,'<mark class="highlight">$1</mark>');}
 
-// TASK SORTING & FILTERING
+// TASK MENU
+function toggleTaskMenu(){
+  taskMenuOpen=!taskMenuOpen;
+  const menu=document.getElementById('task-submenu');
+  const arrow=document.getElementById('task-arrow');
+  if(menu)menu.style.display=taskMenuOpen?'block':'none';
+  if(arrow)arrow.style.transform=taskMenuOpen?'rotate(90deg)':'';
+  if(taskMenuOpen){showView('tasks');document.getElementById('nav-tasks').classList.add('active');}
+}
+
+function showTaskStatus(status){
+  currentTaskStatus=status;currentPage=1;
+  document.querySelectorAll('.nav-subitem').forEach(el=>el.classList.remove('active-sub'));
+  const sub=document.getElementById('sub-'+status);if(sub)sub.classList.add('active-sub');
+  const titles={all:'Tüm Görevler',beklemede:'Beklemede',devam:'Devam Ediyor',donus:'Dönüş Bekleniyor',tamamlandi:'Tamamlandı',iptal:'İptal',urgent:'Deadline Yakın'};
+  const titleEl=document.getElementById('tasks-page-title');if(titleEl)titleEl.textContent=titles[status]||'Görevler';
+  if(!taskMenuOpen){taskMenuOpen=true;const m=document.getElementById('task-submenu');if(m)m.style.display='block';const a=document.getElementById('task-arrow');if(a)a.style.transform='rotate(90deg)';}
+  showView('tasks');
+  document.getElementById('nav-tasks').classList.add('active');
+  renderCurrentTaskView();
+}
+
+function getFilteredTasks(){
+  const q=(document.getElementById('task-search')?.value||'').toLowerCase().trim();
+  const s=currentTaskStatus;
+  return sortTasks(tasks.filter(t=>{
+    if(t.archived)return false;
+    if(s==='all'&&!ACTIVE.includes(t.status||'beklemede'))return false;
+    if(s==='urgent'){if(!ACTIVE.includes(t.status||'beklemede'))return false;const d=dayDiff(t.deadline);if(d>3||d<0)return false;}
+    else if(s!=='all'&&s!=='urgent'){if((t.status||'beklemede')!==s)return false;}
+    if(q&&!t.title.toLowerCase().includes(q)&&!(t.note||'').toLowerCase().includes(q))return false;
+    return true;
+  }));
+}
+
 function sortTasks(arr){
-  const priorityOrder={acil:0,orta:1,dusuk:2};
-  return arr.sort((a,b)=>{
-    const pa=priorityOrder[a.priority]??1,pb=priorityOrder[b.priority]??1;
+  const po={acil:0,orta:1,dusuk:2};
+  return [...arr].sort((a,b)=>{
+    const pa=po[a.priority]??1,pb=po[b.priority]??1;
     if(pa!==pb)return pa-pb;
     const da=a.deadline?new Date(a.deadline).getTime():Infinity;
     const db=b.deadline?new Date(b.deadline).getTime():Infinity;
@@ -873,47 +998,37 @@ function sortTasks(arr){
   });
 }
 
-function getFilteredTasks(){
-  const q=(document.getElementById('task-search')?.value||'').toLowerCase().trim();
-  // Ana sayfa: sadece aktif görevler (tamamlandı, iptal, arşiv yok)
-  return sortTasks(tasks.filter(t=>{
-    if(t.archived)return false;
-    if(!ACTIVE_STATUSES.includes(t.status||'beklemede'))return false;
-    if(currentFilter==='urgent')return dayDiff(t.deadline)<=3&&dayDiff(t.deadline)>=0;
-    if(currentFilter==='all'){}
-    else if(['acil','orta','dusuk'].includes(currentFilter)){if(t.priority!==currentFilter)return false;}
-    else if(t.status!==currentFilter)return false;
-    if(q&&!t.title.toLowerCase().includes(q)&&!(t.note||'').toLowerCase().includes(q))return false;
-    return true;
-  }));
-}
-
-function renderTasks(){
+function renderCurrentTaskView(){
+  const active=tasks.filter(t=>!t.archived&&ACTIVE.includes(t.status||'beklemede'));
+  document.getElementById('s-total').textContent=active.length;
+  document.getElementById('s-active').textContent=active.filter(t=>t.status==='devam').length;
+  document.getElementById('s-done').textContent=tasks.filter(t=>t.status==='tamamlandi').length;
+  document.getElementById('s-urgent').textContent=active.filter(t=>dayDiff(t.deadline)<=3&&dayDiff(t.deadline)>=0).length;
+  if(taskView==='kanban'){renderKanban();return;}
   const filtered=getFilteredTasks();
   const q=document.getElementById('task-search')?.value||'';
-  const allActive=tasks.filter(t=>!t.archived&&ACTIVE_STATUSES.includes(t.status||'beklemede'));
-  document.getElementById('s-total').textContent=allActive.length;
-  document.getElementById('s-active').textContent=allActive.filter(t=>t.status==='devam').length;
-  document.getElementById('s-done').textContent=tasks.filter(t=>t.status==='tamamlandi').length;
-  document.getElementById('s-urgent').textContent=allActive.filter(t=>dayDiff(t.deadline)<=3&&dayDiff(t.deadline)>=0).length;
-  if(taskView==='kanban'){renderKanban(filtered);return;}
   const totalPages=Math.ceil(filtered.length/PAGE_SIZE);
   if(currentPage>totalPages&&totalPages>0)currentPage=totalPages;
   const paged=filtered.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
   if(!paged.length){
-    document.getElementById('task-list').innerHTML=`<div class="empty"><div class="empty-icon">📋</div>${q?'Arama sonucu bulunamadı':'Aktif görev yok'}</div>`;
+    document.getElementById('task-list').innerHTML=`<div class="empty"><div class="empty-icon">📋</div>Bu kategoride görev yok</div>`;
     document.getElementById('task-pagination').innerHTML='';return;
   }
   document.getElementById('task-list').innerHTML=paged.map(t=>renderTaskCard(t,q)).join('');
-  // Pagination
-  if(totalPages>1){
-    let pages='';
-    for(let i=1;i<=totalPages;i++){
-      if(i===1||i===totalPages||Math.abs(i-currentPage)<=1)pages+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
-      else if(Math.abs(i-currentPage)===2)pages+=`<span style="padding:0 4px;color:#aaa;">...</span>`;
-    }
-    document.getElementById('task-pagination').innerHTML=`<div class="pagination"><button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>${pages}<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button><span style="font-size:12px;color:#aaa;margin-left:8px;">${filtered.length} görev</span></div>`;
-  }else{document.getElementById('task-pagination').innerHTML='';}
+  document.getElementById('task-pagination').innerHTML=totalPages>1?`<div class="pagination"><button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>${Array.from({length:totalPages},(_,i)=>`<button class="page-btn ${i+1===currentPage?'active':''}" onclick="goPage(${i+1})">${i+1}</button>`).join('')}<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button><span style="font-size:12px;color:var(--gray-400);margin-left:8px;">${filtered.length} görev</span></div>`:'';
+}
+
+function goPage(p){currentPage=p;renderCurrentTaskView();window.scrollTo(0,0);}
+function setTaskView(v){taskView=v;document.getElementById('vbtn-list').classList.toggle('active',v==='list');document.getElementById('vbtn-kanban').classList.toggle('active',v==='kanban');document.getElementById('task-kanban').style.display=v==='kanban'?'block':'none';renderCurrentTaskView();}
+
+function renderKanban(){
+  document.getElementById('task-list').innerHTML='';document.getElementById('task-pagination').innerHTML='';
+  document.getElementById('task-kanban').style.display='block';
+  const active=getFilteredTasks();
+  document.getElementById('task-kanban').innerHTML=`<div class="kanban-board">${Object.entries(STATUS_MAP).filter(([k])=>ACTIVE.includes(k)).map(([k,v])=>{
+    const col=active.filter(t=>(t.status||'beklemede')===k);
+    return `<div class="kanban-col"><div class="kanban-col-header"><span>${v.l}</span><span class="kanban-count">${col.length}</span></div>${col.map(t=>`<div class="kanban-card" onclick="showTaskStatus('${k}');setTimeout(()=>toggleExpand('${t.id}'),100)"><div style="font-weight:600;margin-bottom:5px;">${t.title}</div><div style="display:flex;gap:4px;flex-wrap:wrap;">${pBadge(t.priority)}${dlLabel(t.deadline)}</div></div>`).join('')}</div>`;
+  }).join('')}</div>`;
 }
 
 function renderTaskCard(t,q=''){
@@ -921,6 +1036,8 @@ function renderTaskCard(t,q=''){
   const st=t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   const sn=(t.note||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
   const isExpanded=expandedId===t.id;
+  let files=[];try{files=t.files?JSON.parse(t.files):[];}catch(e){}
+
   return `<div class="task-card ${isExpanded?'expanded':''}">
     <div class="task-card-header" onclick="toggleExpand('${t.id}')">
       <div class="task-info">
@@ -928,243 +1045,167 @@ function renderTaskCard(t,q=''){
         <div class="task-meta">${pBadge(t.priority)}${sBadge(t.status||'beklemede')}${dlLabel(t.deadline)}${ta.map(e=>`<span class="badge badge-purple">@${e.split('@')[0]}</span>`).join('')}${tc.length?`<span class="badge badge-gray">💬 ${tc.length}</span>`:''}</div>
       </div>
       <div class="task-btns">
-        ${can('ai_research')?`<button class="icon-btn ai-btn" onclick="event.stopPropagation();aiResearch('${t.id}','${st}')">✦ Araştır</button>`:''}
-        ${can('telegram_send')?`<button class="icon-btn tg-btn" onclick="event.stopPropagation();prepareTg('gorev','${st}','${t.deadline||''}','${t.priority}','${t.status||'beklemede'}')">✈</button>`:''}
-        ${can('task_archive')?`<button class="icon-btn archive-btn" onclick="event.stopPropagation();archiveTask('${t.id}')" title="Arşive taşı">🗄</button>`:''}
+        ${can('ai_research')?`<button class="icon-btn btn-ai" onclick="event.stopPropagation();aiResearch('${t.id}','${st}')">✦ AI</button>`:''}
+        ${can('telegram_send')?`<button class="icon-btn btn-tg" onclick="event.stopPropagation();prepareTg('gorev','${st}','${t.deadline||''}','${t.priority}','${t.status||'beklemede'}')">✈</button>`:''}
+        ${can('task_archive')?`<button class="icon-btn btn-archive" onclick="event.stopPropagation();archiveTask('${t.id}')" title="Arşive taşı">🗄</button>`:''}
       </div>
     </div>
-    <div class="ai-loading" id="ai-load-${t.id}" style="display:none;padding:8px 16px;font-size:12px;color:#3C3489;">✦ AI araştırıyor...</div>
+    <div class="ai-loading" id="ai-load-${t.id}" style="display:none;">✦ AI araştırıyor...</div>
     <div class="ai-result-box" id="ai-res-${t.id}"></div>
     ${isExpanded?`<div class="task-detail show">
-      <div class="task-detail-left">
-        <div class="detail-section-label">Durum</div>
-        <div class="status-pills-row">
-          ${Object.entries(STATUS_MAP).map(([k,v])=>`<button class="status-pill-btn spb-${k} ${(t.status||'beklemede')===k?'active-status':''}" onclick="${can('task_status_change')?`updateStatus('${t.id}','${k}')`:'void(0)'}">${v.l}</button>`).join('')}
-        </div>
-        <div class="detail-section-label">Atanan Kişiler</div>
-        <div class="assignee-avatars">
-          ${ta.map((e,i)=>`<div class="assignee-av"><div class="av-circle" style="${avStyle(e,i)}">${avInitial(e)}</div><span class="av-name">${e}</span>${can('task_assign')?`<button class="av-remove" onclick="removeAssignee('${t.id}','${e}')">✕</button>`:''}</div>`).join('')}
-        </div>
-        ${can('task_assign')?`<div class="inline-form"><select class="inline-input" id="ai-sel-${t.id}"><option value="">Kişi seç...</option>${profiles.map(p=>`<option value="${p.id}">${p.full_name||p.id.substring(0,8)}</option>`).join('')}</select><button class="inline-btn" onclick="addAssigneeFromSelect('${t.id}')">Ekle</button></div>`:''}
-        ${can('file_upload')?`<div class="detail-section-label">Dosyalar</div><div class="attachments">${(()=>{let files=[];try{files=t.files?JSON.parse(t.files):[];}catch(e){}return files.map(f=>`<span class="attach-item">📎 <a href="${f.url}" target="_blank">${f.name}</a></span>`).join('');})()}</div><label class="file-input-label">📎 Ekle<input type="file" style="display:none;" multiple onchange="uploadTaskFiles('${t.id}',this)"/></label>`:''}
-        <div class="detail-section-label">Açıklama</div>
-        <div class="detail-note-text">${highlight(t.note||'Henüz not eklenmedi.',q)}</div>
-        ${can('task_edit_own')||can('task_edit_all')?`<button class="icon-btn" style="font-size:11px;" onclick="editNote('${t.id}','${sn}')">✏ Notu Düzenle</button>`:''}
-      </div>
-      <div class="task-detail-right">
-        <div style="padding:12px 16px;border-bottom:1px solid #f0f0ea;font-size:12px;font-weight:600;color:#555;">Yorumlar (${tc.length})</div>
-        <div class="chat-area" id="chat-area-${t.id}">
-          ${tc.length===0?'<div style="text-align:center;color:#aaa;font-size:12px;padding:20px;">Henüz yorum yok</div>':''}
-          ${tc.map(c=>{const isMe=c.user_id===me.id;const idx=profiles.findIndex(p=>p.id===c.user_id);return `<div class="chat-msg ${isMe?'mine':''}">
-            <div class="chat-av" style="${avStyle(c.user_email,idx>=0?idx:0)}">${avInitial(c.user_email)}</div>
-            <div>
-              <div class="chat-bubble">${renderMentions(c.content)}</div>
-              ${c.file_url?`<div class="chat-attach"><a href="${c.file_url}" target="_blank">📎 ${c.file_name||'Dosya'}</a></div>`:''}
-              <div class="chat-meta">${isMe?'':'<b>'+c.user_email+'</b> · '}${fmtDT(c.created_at)}</div>
-            </div>
-          </div>`}).join('')}
-        </div>
-        <div class="chat-input-area" style="position:relative;">
-          <div style="flex:1;position:relative;">
-            <textarea class="chat-input" id="ci-${t.id}" rows="1" placeholder="Yorum yaz... @ ile etiketle" onkeydown="commentKeyDown(event,'${t.id}')" onkeyup="handleTaskMention(event,'${t.id}')"></textarea>
-            <div class="mention-dropdown" id="mention-dd-${t.id}" style="bottom:45px;"></div>
+      <!-- META BAR -->
+      <div class="task-meta-bar">
+        <!-- Durum -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Durum</div>
+          <div class="status-chips">
+            ${Object.entries(STATUS_MAP).map(([k,v])=>`<button class="status-chip sc-${k} ${(t.status||'beklemede')===k?'sc-active':''}" onclick="${can('task_status_change')?`updateStatus('${t.id}','${k}')`:'void(0)'}">${v.l}</button>`).join('')}
           </div>
-          ${can('file_upload')?`<label class="chat-file-btn">📎<input type="file" style="display:none;" onchange="setCommentFile(this,'${t.id}')"/></label>`:''}
-          <button class="chat-send-btn" onclick="addComment('${t.id}')">↑</button>
         </div>
-        <div id="cfile-${t.id}" style="padding:0 12px 8px;font-size:11px;color:#888;"></div>
+        <!-- Atanan -->
+        <div style="margin-left:16px;">
+          <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Atanan</div>
+          <div class="assignee-chips" style="position:relative;">
+            ${ta.map((e,i)=>`<div class="assignee-chip"><div class="assignee-chip-av">${avInitial(e)}</div>${e.split('@')[0]}${can('task_assign')?`<button class="assignee-chip-x" onclick="removeAssignee('${t.id}','${e}')">✕</button>`:''}</div>`).join('')}
+            ${can('task_assign')?`<div style="position:relative;">
+              <button class="add-assignee-btn" onclick="toggleAssigneeDD('${t.id}')">+ Ekle</button>
+              <div class="assignee-dropdown" id="add-dd-${t.id}">
+                ${profiles.map(p=>`<div class="assignee-dropdown-item" onclick="addAssigneeByProfile('${t.id}','${p.id}')"><div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;${avStyle(p.full_name,profiles.indexOf(p))}">${avInitial(p.full_name)}</div>${p.full_name||p.email||'İsimsiz'}</div>`).join('')}
+              </div>
+            </div>`:''
+            }
+          </div>
+        </div>
+      </div>
+      <!-- DOSYALAR -->
+      ${files.length||can('file_upload')?`<div class="task-files">
+        <span style="font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px;">Dosyalar</span>
+        ${files.map(f=>`<div class="file-chip">📎 <a href="${f.url}" target="_blank">${f.name}</a></div>`).join('')}
+        ${can('file_upload')?`<label class="file-add-btn">📎 Ekle<input type="file" style="display:none;" multiple onchange="uploadTaskFiles('${t.id}',this)"/></label>`:''}
+      </div>`:''}
+      <!-- AÇIKLAMA -->
+      <div class="task-description">
+        <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Açıklama</div>
+        <div class="task-desc-text">${highlight(t.note||'<span style="color:var(--gray-300);">Not eklenmedi...</span>',q)}</div>
+        ${can('task_edit_own')||can('task_edit_all')?`<button class="icon-btn" style="font-size:11px;" onclick="editNote('${t.id}','${sn}')">✏ Düzenle</button>`:''}
+      </div>
+      <!-- YORUMLAR -->
+      <div class="comments-section">
+        <div class="comments-header">💬 Yorumlar (${tc.length})</div>
+        <div class="comments-list" id="clist-${t.id}">
+          ${!tc.length?'<div style="text-align:center;color:var(--gray-300);font-size:13px;padding:20px;">Henüz yorum yok</div>':''}
+          ${tc.map(c=>{
+            const isMe=c.user_id===me.id;
+            const idx=profiles.findIndex(p=>p.id===c.user_id);
+            return `<div class="comment-item ${isMe?'mine':''}">
+              <div class="comment-av" style="${avStyle(c.user_email,idx>=0?idx:0)}">${avInitial(c.user_email)}</div>
+              <div class="comment-body">
+                <div class="comment-bubble">${renderMentions(c.content,isMe)}</div>
+                ${c.file_url?`<div class="comment-attach"><a href="${c.file_url}" target="_blank">📎 ${c.file_name||'Dosya'}</a></div>`:''}
+                <div class="comment-meta">${isMe?'':'<b>'+c.user_email+'</b> · '}${fmtDT(c.created_at)}</div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="comment-input-area" style="position:relative;">
+          <div style="flex:1;position:relative;">
+            <textarea class="comment-textarea" id="ci-${t.id}" rows="1" placeholder="Yorum yaz... @ ile etiketle" onkeydown="commentKeyDown(event,'${t.id}')" onkeyup="handleTaskMention(event,'${t.id}')"></textarea>
+            <div class="mention-dropdown" id="mention-dd-${t.id}" style="bottom:50px;"></div>
+          </div>
+          ${can('file_upload')?`<label class="comment-file-btn" title="Dosya ekle">📎<input type="file" style="display:none;" onchange="setCommentFile(this,'${t.id}')"/></label>`:''}
+          <button class="comment-send-btn" onclick="addComment('${t.id}')" type="button">↑</button>
+        </div>
+        <div id="cfile-${t.id}" style="padding:0 14px 8px;font-size:11px;color:var(--gray-400);"></div>
       </div>
     </div>`:''}
   </div>`;
 }
 
-function renderKanban(filtered){
-  document.getElementById('task-list').innerHTML='';
-  document.getElementById('task-pagination').innerHTML='';
-  document.getElementById('task-kanban').style.display='block';
-  document.getElementById('task-kanban').innerHTML=`<div class="kanban-board">${Object.entries(STATUS_MAP).filter(([k])=>ACTIVE_STATUSES.includes(k)).map(([k,v])=>{
-    const col=filtered.filter(t=>(t.status||'beklemede')===k);
-    return `<div class="kanban-col"><div class="kanban-col-header"><span>${v.l}</span><span class="kanban-count">${col.length}</span></div>${col.map(t=>`<div class="kanban-card" onclick="toggleExpand('${t.id}');setTaskView('list')"><div class="kanban-card-title">${t.title}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">${pBadge(t.priority)}${dlLabel(t.deadline)}</div></div>`).join('')}</div>`;
-  }).join('')}</div>`;
+function toggleAssigneeDD(taskId){
+  const dd=document.getElementById('add-dd-'+taskId);
+  if(dd)dd.style.display=dd.style.display==='block'?'none':'block';
 }
 
-function goPage(p){currentPage=p;renderTasks();window.scrollTo(0,0);}
-
-function renderMeetings(){
-  const q=(document.getElementById('meeting-search')?.value||'').toLowerCase();
-  const filtered=meetings.filter(m=>!q||m.title.toLowerCase().includes(q));
-  if(!filtered.length){document.getElementById('meeting-list').innerHTML='<div class="empty"><div class="empty-icon">📝</div>Toplantı notu bulunamadı</div>';return;}
-  document.getElementById('meeting-list').innerHTML=filtered.map(m=>`
-    <div class="meeting-card"><div class="meeting-top">
-      <div style="flex:1;"><div style="font-size:14px;font-weight:500;margin-bottom:4px;">${highlight(m.title,q)}</div><div style="font-size:12px;color:#888;margin-bottom:6px;">📅 ${fmtDate(m.meeting_date)} · 👥 ${m.people||''}</div><div style="font-size:13px;color:#666;line-height:1.6;">${m.note||''}</div></div>
-      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
-        ${can('telegram_send')?`<button class="icon-btn tg-btn" onclick="prepareTgMeeting('${m.id}')">✈ Telegram</button>`:''}
-        ${can('meeting_delete')?`<button class="icon-btn" style="color:#A32D2D;" onclick="deleteMeeting('${m.id}')">✕ Sil</button>`:''}
-      </div>
-    </div></div>`).join('');
+async function addAssigneeByProfile(taskId,profileId){
+  const profile=profiles.find(p=>p.id===profileId);if(!profile)return;
+  const displayName=profile.full_name||profileId.substring(0,8);
+  const {error}=await sb.from('task_assignees').upsert({task_id:taskId,user_email:displayName});
+  if(error){showToast('Hata: '+error.message,'err');return;}
+  if(!assignees[taskId])assignees[taskId]=[];
+  if(!assignees[taskId].includes(displayName))assignees[taskId].push(displayName);
+  const dd=document.getElementById('add-dd-'+taskId);if(dd)dd.style.display='none';
+  expandedId=taskId;renderCurrentTaskView();showToast('Kişi eklendi ✓','ok');
+  const task=tasks.find(t=>t.id===taskId);
+  if(profile.email?.includes('@'))sendEmail('assigned',profile.email,task?.title||'',me.email,task?.deadline,task?.priority);
 }
 
-function renderUsers(){
-  const q=(document.getElementById('user-search')?.value||'').toLowerCase();
-  const filtered=profiles.filter(p=>!q||(p.full_name||'').toLowerCase().includes(q)||(p.email||'').toLowerCase().includes(q));
-  const el=document.getElementById('user-list');
-  if(!filtered.length){el.innerHTML='<div class="empty">Kullanıcı bulunamadı</div>';return;}
-  el.innerHTML=`<div style="background:#fff;border:1px solid #e8e8e4;border-radius:12px;overflow:hidden;">
-    <table class="data-table">
-      <thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Rol</th><th>Durum</th><th>İşlem</th></tr></thead>
-      <tbody>${filtered.map((p,i)=>{
-        const roleObj=roles.find(r=>r.id===p.role_id);
-        return `<tr>
-          <td><div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;${avStyle(p.full_name,i)}">${avInitial(p.full_name)}</div><span style="font-weight:500;">${p.full_name||'İsimsiz'}</span></div></td>
-          <td style="font-size:12px;color:#888;">${p.email||'—'}</td>
-          <td>${roleObj?`<span style="background:${roleObj.color}22;color:${roleObj.color};padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;">${roleObj.name}</span>`:'<span class="badge badge-gray">Atanmamış</span>'}</td>
-          <td>${statusIcon(p.status||'offline')}</td>
-          <td style="display:flex;gap:4px;">${can('user_manage')?`<button class="icon-btn" onclick="openAssignRoleModal('${p.id}','${(p.full_name||'').replace(/'/g,"\'")}','${p.role_id||''}')">✏ Rol Ata</button><button class="icon-btn" onclick="editUserInfo('${p.id}','${(p.full_name||'').replace(/'/g,"\'")}')">✎ Düzenle</button>`:'—'}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>
-  </div>`;
+async function removeAssignee(taskId,email){
+  await sb.from('task_assignees').delete().eq('task_id',taskId).eq('user_email',email);
+  if(assignees[taskId])assignees[taskId]=assignees[taskId].filter(e=>e!==email);
+  expandedId=taskId;renderCurrentTaskView();
 }
 
-function renderRoles(){
-  const el=document.getElementById('roles-list');
-  if(!roles.length){el.innerHTML='<div class="empty">Henüz rol oluşturulmadı</div>';return;}
-  el.innerHTML=roles.map(r=>`<div class="role-card">
-    <div class="role-card-top"><div class="role-dot" style="background:${r.color}"></div><div style="font-size:16px;font-weight:600;flex:1;">${r.name}</div>
-    ${can('role_manage')?`<div style="display:flex;gap:6px;"><button class="icon-btn" onclick="openEditRole('${r.id}')">✏ Düzenle</button><button class="icon-btn" style="color:#A32D2D;" onclick="deleteRole('${r.id}')">✕ Sil</button></div>`:''}</div>
-    <div class="perm-grid">${PERM_KEYS.map(k=>`<div class="perm-item"><span>${PERM_LABELS[k]}</span><span>${(r.permissions||{})[k]?'✅':'❌'}</span></div>`).join('')}</div>
-  </div>`).join('');
+function renderTeamStatus(){
+  const el=document.getElementById('team-status-list');if(!el)return;
+  const others=profiles.filter(p=>p.id!==me?.id).slice(0,8);
+  if(!others.length){el.innerHTML='<div style="font-size:11px;color:var(--gray-400);padding:2px;">Henüz kimse yok</div>';return;}
+  el.innerHTML=others.map((p,i)=>`
+    <div class="ts-item">
+      <div class="ts-av" style="${avStyle(p.full_name,i)}">${avInitial(p.full_name)}</div>
+      <span class="ts-name">${p.full_name||p.email||'İsimsiz'}</span>
+      <div class="ts-dot ${p.status==='online'?'ts-online':p.status==='away'?'ts-away':'ts-offline'}"></div>
+    </div>`).join('');
 }
 
-function renderTeams(){
-  const el=document.getElementById('team-list');
-  if(!teams.length){el.innerHTML='<div class="empty">Henüz ekip oluşturulmadı</div>';return;}
-  el.innerHTML=teams.map(t=>{let m=[];try{m=t.members?JSON.parse(t.members):[];}catch(e){}
-    return `<div class="team-card"><div class="meeting-top"><div style="flex:1;"><div style="font-size:14px;font-weight:500;">${t.name}</div><div style="font-size:12px;color:#888;">${t.description||''}</div><div class="team-members-list">${m.map(x=>`<span class="team-member-tag">👤 ${x}</span>`).join('')}</div></div>${can('team_manage')?`<button class="icon-btn" style="color:#A32D2D;" onclick="deleteTeam('${t.id}')">✕ Sil</button>`:''}</div></div>`;
-  }).join('');
+// SOUND
+function initAudio(){if(!audioCtx)try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+function playNotifSound(){
+  try{
+    initAudio();if(!audioCtx)return;
+    const osc=audioCtx.createOscillator();const gain=audioCtx.createGain();
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(880,audioCtx.currentTime);
+    osc.frequency.setValueAtTime(1100,audioCtx.currentTime+0.08);
+    gain.gain.setValueAtTime(0.25,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.25);
+    osc.start(audioCtx.currentTime);osc.stop(audioCtx.currentTime+0.25);
+  }catch(e){}
 }
-
-function renderProfile(){
-  const idx=profiles.findIndex(p=>p.id===me.id);
-  const av=document.getElementById('profile-avatar');
-  av.textContent=avInitial(myProfile.full_name);av.style.cssText=avStyle(myProfile.full_name,idx>=0?idx:0);
-  document.getElementById('profile-name-display').textContent=myProfile.full_name||'İsimsiz';
-  document.getElementById('profile-email-display').textContent=me.email;
-  document.getElementById('profile-name-input').value=myProfile.full_name||'';
-  const roleObj=roles.find(r=>r.id===myProfile.role_id);
-  document.getElementById('profile-role-badge').innerHTML=roleObj?`<span style="background:${roleObj.color}22;color:${roleObj.color};padding:3px 12px;border-radius:10px;font-size:12px;font-weight:500;">${roleObj.name}</span>`:'';
-  document.getElementById('profile-msg').textContent='';
-  document.getElementById('profile-pass1').value='';document.getElementById('profile-pass2').value='';
-}
-
-// DASHBOARD
-function renderDashboard(){
-  const active=tasks.filter(t=>!t.archived&&ACTIVE_STATUSES.includes(t.status||'beklemede'));
-  const done=tasks.filter(t=>t.status==='tamamlandi').length;
-  const urgent=active.filter(t=>dayDiff(t.deadline)<=3&&dayDiff(t.deadline)>=0).length;
-  const overdue=active.filter(t=>dayDiff(t.deadline)<0).length;
-  const rate=tasks.length?Math.round(done/tasks.length*100):0;
-  const personStats={};
-  Object.entries(assignees).forEach(([tid,names])=>{
-    const t=tasks.find(t=>t.id===tid);if(!t)return;
-    names.forEach(n=>{if(!personStats[n])personStats[n]={total:0,done:0};personStats[n].total++;if(t.status==='tamamlandi')personStats[n].done++;});
-  });
-  const top=Object.entries(personStats).sort((a,b)=>b[1].total-a[1].total).slice(0,6);
-  const maxC=Math.max(...Object.values(STATUS_MAP).map((_,i)=>tasks.filter(t=>t.status===Object.keys(STATUS_MAP)[i]).length),1);
-  document.getElementById('dashboard-content').innerHTML=`
-    <div class="stat-row" style="grid-template-columns:repeat(5,minmax(0,1fr));">
-      <div class="stat-card"><div class="stat-label">Aktif Görev</div><div class="stat-val">${active.length}</div></div>
-      <div class="stat-card"><div class="stat-label">Tamamlanan</div><div class="stat-val" style="color:#3B6D11;">${done}</div></div>
-      <div class="stat-card"><div class="stat-label">Devam Eden</div><div class="stat-val" style="color:#185FA5;">${active.filter(t=>t.status==='devam').length}</div></div>
-      <div class="stat-card"><div class="stat-label">Deadline Yakın</div><div class="stat-val" style="color:#854F0B;">${urgent}</div></div>
-      <div class="stat-card"><div class="stat-label">Gecikmiş</div><div class="stat-val" style="color:#A32D2D;">${overdue}</div></div>
-    </div>
-    <div class="dash-grid">
-      <div class="dash-card"><div class="dash-card-title">Durum Dağılımı</div>${Object.entries(STATUS_MAP).map(([k,v])=>{const c=tasks.filter(t=>t.status===k).length;return `<div class="dash-bar-row"><span class="dash-bar-label">${v.l}</span><div class="dash-bar-wrap"><div class="dash-bar" style="width:${Math.round(c/Math.max(maxC,1)*100)}%"></div></div><span class="dash-bar-val">${c}</span></div>`;}).join('')}</div>
-      <div class="dash-card"><div class="dash-card-title">Özet</div>
-        <div class="dash-stat"><span>Tamamlanma Oranı</span><span style="font-weight:600;color:#3B6D11;">%${rate}</span></div>
-        <div class="dash-stat"><span>Toplam Yorum</span><span style="font-weight:600;">${Object.values(comments).flat().length}</span></div>
-        <div class="dash-stat"><span>Toplantı Notu</span><span style="font-weight:600;">${meetings.length}</span></div>
-        <div class="dash-stat"><span>Chat Mesajı</span><span style="font-weight:600;">${chatMessages.length}</span></div>
-        <div class="dash-stat"><span>Kullanıcı</span><span style="font-weight:600;">${profiles.length}</span></div>
-      </div>
-      ${top.length?`<div class="dash-card"><div class="dash-card-title">Kişi Bazlı</div>${top.map(([n,s])=>`<div class="dash-bar-row"><span class="dash-bar-label">${n}</span><div class="dash-bar-wrap"><div class="dash-bar" style="width:${Math.round(s.done/Math.max(s.total,1)*100)}%;background:#3B6D11;"></div></div><span class="dash-bar-val" style="font-size:11px;">${s.done}/${s.total}</span></div>`).join('')}</div>`:''}
-      <div class="dash-card"><div class="dash-card-title">Yaklaşan Deadlineler</div>${active.filter(t=>dayDiff(t.deadline)<=7&&dayDiff(t.deadline)>=0).sort((a,b)=>dayDiff(a.deadline)-dayDiff(b.deadline)).slice(0,6).map(t=>`<div class="dash-stat"><span style="flex:1;font-size:13px;">${t.title.substring(0,28)}${t.title.length>28?'...':''}</span><span style="font-size:12px;color:#A32D2D;font-weight:600;">${dayDiff(t.deadline)} gün</span></div>`).join('')||'<div style="color:#aaa;text-align:center;padding:16px;">Yaklaşan deadline yok 🎉</div>'}</div>
-    </div>`;
-}
-
-// CALENDAR
-function renderCalendar(){
-  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  const days=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-  const first=new Date(calYear,calMonth,1),last=new Date(calYear,calMonth+1,0);
-  const startDow=(first.getDay()+6)%7;
-  const today=new Date();today.setHours(0,0,0,0);
-  let html=`<div style="background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:20px;">
-    <div class="cal-header"><button class="icon-btn" onclick="calNav(-1)">‹</button><div class="cal-month">${months[calMonth]} ${calYear}</div><button class="icon-btn" onclick="calNav(1)">›</button></div>
-    <div class="cal-grid">${days.map(d=>`<div class="cal-day-label">${d}</div>`).join('')}`;
-  let day=1-startDow;
-  for(let r=0;r<6;r++){
-    let hasDay=false;
-    for(let c=0;c<7;c++){
-      const date=new Date(calYear,calMonth,day);const isThisMonth=date.getMonth()===calMonth;if(isThisMonth)hasDay=true;
-      const isToday=date.getTime()===today.getTime();const dateStr=date.toISOString().split('T')[0];
-      const dt=tasks.filter(t=>t.deadline===dateStr&&ACTIVE_STATUSES.includes(t.status||'beklemede'));
-      html+=`<div class="cal-day ${isToday?'today':''} ${!isThisMonth?'other-month':''}"><div class="cal-day-num">${date.getDate()}</div>${dt.slice(0,2).map(t=>`<div class="cal-task-dot ${dayDiff(t.deadline)<=1?'urgent':''}">${t.title.substring(0,11)}${t.title.length>11?'...':''}</div>`).join('')}${dt.length>2?`<div style="font-size:10px;color:#888;">+${dt.length-2}</div>`:''}</div>`;
-      day++;
-    }
-    if(!hasDay)break;
-  }
-  html+='</div></div>';
-  document.getElementById('calendar-content').innerHTML=html;
-}
-function calNav(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
 
 // CHAT
-async function loadChannels(){
-  const {data}=await sb.from('chat_channels').select('*').order('created_at',{ascending:true});
-  channels=data||[];renderChannelList();
-}
-
+async function loadChatChannels(){await loadChannels();}
 function renderChannelList(){
-  const publicChannels=channels.filter(c=>c.type==='channel');
-  document.getElementById('channel-list').innerHTML=publicChannels.map(c=>`
-    <div class="chat-channel-item ${currentChannel?.id===c.id?'active':''}" onclick="selectChannel('${c.id}')">
+  const pub=channels.filter(c=>c.type==='channel');
+  document.getElementById('channel-list').innerHTML=pub.map(c=>`
+    <div class="chat-ch-item ${currentChannel?.id===c.id?'active':''}" onclick="selectChannel('${c.id}')">
       <span>#</span><span style="flex:1;">${c.name}</span>
     </div>`).join('');
-  // DM listesi - diğer kullanıcılar
-  const dmChannels=channels.filter(c=>c.type==='direct');
-  document.getElementById('dm-list').innerHTML=profiles.filter(p=>p.id!==me.id).map((p,i)=>{
-    const dmCh=dmChannels.find(c=>{let m=[];try{m=JSON.parse(c.members);}catch(e){}return m.includes(me.id)&&m.includes(p.id);});
-    return `<div class="chat-channel-item ${currentChannel?.id===dmCh?.id?'active':''}" onclick="openDM('${p.id}','${(p.full_name||p.id).replace(/'/g,"\\'")}')">
-      <div style="width:8px;height:8px;border-radius:50%;${p.status==='online'?'background:#3B6D11':p.status==='away'?'background:#854F0B':'background:#ddd'};flex-shrink:0;"></div>
+  document.getElementById('dm-list').innerHTML=profiles.filter(p=>p.id!==me?.id).map((p,i)=>{
+    const dm=channels.find(c=>{if(c.type!=='direct')return false;let m=[];try{m=JSON.parse(c.members);}catch(e){}return m.includes(me.id)&&m.includes(p.id);});
+    const s=p.status==='online'?'#22c55e':p.status==='away'?'#f59e0b':'var(--gray-300)';
+    return `<div class="chat-ch-item ${currentChannel?.id===dm?.id?'active':''}" onclick="openDM('${p.id}','${(p.full_name||p.email||'').replace(/'/g,"\\'")}')">
+      <div style="width:8px;height:8px;border-radius:50%;background:${s};flex-shrink:0;"></div>
       <span style="flex:1;">${p.full_name||p.email||'İsimsiz'}</span>
     </div>`;
   }).join('');
 }
 
 async function selectChannel(channelId){
-  initChatFont();
-  document.getElementById('chat-settings-bar').style.display='none';
   currentChannel=channels.find(c=>c.id===channelId);
-  document.getElementById('chat-channel-name').textContent=(currentChannel.type==='channel'?'#':'')+currentChannel.name;
-  document.getElementById('chat-channel-sub').textContent=currentChannel.type==='channel'?'Genel kanal':'Direkt mesaj';
+  document.getElementById('chat-channel-name').textContent=(currentChannel.type==='channel'?'# ':'')+currentChannel.name;
   document.getElementById('chat-input-area').style.display='flex';
   renderChannelList();
-  await loadChatMessages();
-  if(chatChannel)sb.removeChannel(chatChannel);
-  chatChannel=sb.channel('chat-'+channelId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:`channel_id=eq.${channelId}`},async()=>{await loadChatMessages();})
+  if(chatRealtime)sb.removeChannel(chatRealtime);
+  chatRealtime=sb.channel('chat-'+channelId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:`channel_id=eq.${channelId}`},()=>loadChatMessages())
     .subscribe();
+  await loadChatMessages();
+  applyChatFont();
 }
 
 async function openDM(userId,userName){
-  // DM kanalı bul veya oluştur
   let dmCh=channels.find(c=>{if(c.type!=='direct')return false;let m=[];try{m=JSON.parse(c.members);}catch(e){}return m.includes(me.id)&&m.includes(userId);});
-  if(!dmCh){
-    const {data}=await sb.from('chat_channels').insert({name:userName,type:'direct',members:JSON.stringify([me.id,userId]),created_by:me.id}).select().single();
-    dmCh=data;channels.push(dmCh);
-  }
+  if(!dmCh){const {data}=await sb.from('chat_channels').insert({name:userName,type:'direct',members:JSON.stringify([me.id,userId]),created_by:me.id}).select().single();dmCh=data;channels.push(dmCh);}
   await selectChannel(dmCh.id);
 }
 
@@ -1174,29 +1215,27 @@ async function loadChatMessages(){
   chatMessages=data||[];renderChatMessages();
 }
 
-let lastChatMsgCount=0;
 function renderChatMessages(){
-  const el=document.getElementById('chat-messages');
-  if(!chatMessages.length){el.innerHTML='<div style="text-align:center;color:#aaa;font-size:13px;padding:40px;">Henüz mesaj yok</div>';return;}
-  // Yeni mesaj geldi mi? Ses çal
-  if(lastChatMsgCount>0 && chatMessages.length>lastChatMsgCount){
-    const lastMsg=chatMessages[chatMessages.length-1];
-    if(lastMsg.user_id!==me?.id){playNotifSound();}
+  const el=document.getElementById('chat-messages');if(!el)return;
+  if(!chatMessages.length){el.innerHTML='<div style="text-align:center;color:var(--gray-400);padding:40px;">Henüz mesaj yok</div>';return;}
+  if(lastChatCount>0&&chatMessages.length>lastChatCount){
+    const last=chatMessages[chatMessages.length-1];
+    if(last.user_id!==me?.id)playNotifSound();
   }
-  lastChatMsgCount=chatMessages.length;
+  lastChatCount=chatMessages.length;
   let prevDate='';
   el.innerHTML=chatMessages.map((msg,i)=>{
     const isMe=msg.user_id===me.id;
     const idx=profiles.findIndex(p=>p.id===msg.user_id);
     const msgDate=new Date(msg.created_at).toLocaleDateString('tr-TR');
-    let dateSep='';
-    if(msgDate!==prevDate){dateSep=`<div class="chat-date-sep">${msgDate}</div>`;prevDate=msgDate;}
-    return `${dateSep}<div class="chat-msg-full ${isMe?'mine':''}">
-      <div class="chat-av" style="${avStyle(msg.user_name||msg.user_id,idx>=0?idx:i)}">${avInitial(msg.user_name||msg.user_id)}</div>
+    let sep='';if(msgDate!==prevDate){sep=`<div class="chat-date-sep">${msgDate}</div>`;prevDate=msgDate;}
+    const mentions=(msg.content||'').replace(/@(\S+)/g,'<span style="color:'+( isMe?'#C7D2FE':'#4338CA')+';font-weight:600;">@$1</span>');
+    return `${sep}<div class="chat-msg-full ${isMe?'mine':''}" id="cmsg-${msg.id}">
+      <div class="chat-av-full" style="${avStyle(msg.user_name||'?',idx>=0?idx:i)}">${avInitial(msg.user_name||'?')}</div>
       <div class="bubble-wrap">
-        ${!isMe?`<div style="font-size:11px;color:#888;margin-bottom:2px;">${msg.user_name||'Kullanıcı'}</div>`:''}
-        <div class="chat-bubble-full">${renderMentions(msg.content)}</div>
-        ${msg.file_url?`<div class="chat-attach" style="margin-top:4px;"><a href="${msg.file_url}" target="_blank">📎 ${msg.file_name||'Dosya'}</a></div>`:''}
+        ${!isMe?`<div style="font-size:10px;font-weight:600;color:var(--gray-400);margin-bottom:3px;">${msg.user_name||'Kullanıcı'}</div>`:''}
+        <div class="chat-bubble-full">${mentions}</div>
+        ${msg.file_url?`<div style="margin-top:4px;font-size:12px;"><a href="${msg.file_url}" target="_blank" style="color:${isMe?'#C7D2FE':'var(--accent)'};text-decoration:none;">📎 ${msg.file_name||'Dosya'}</a></div>`:''}
         <div class="chat-msg-meta">${fmtTime(msg.created_at)}</div>
       </div>
     </div>`;
@@ -1204,41 +1243,42 @@ function renderChatMessages(){
   el.scrollTop=el.scrollHeight;
 }
 
-async function sendChatMessage(){initAudio();
+async function sendChatMessage(){
   if(!currentChannel)return;
+  initAudio();
   const input=document.getElementById('chat-input');
-  const content=input.value.trim();if(!content&&!chatFile)return;
+  const content=input.value.trim();
+  if(!content&&!chatFile)return;
   let fileUrl=null,fileName=null;
   if(chatFile){
     const path=`chat/${currentChannel.id}/${Date.now()}_${chatFile.name}`;
     const {error}=await sb.storage.from('attachments').upload(path,chatFile,{upsert:true});
     if(!error){const {data:u}=sb.storage.from('attachments').getPublicUrl(path);fileUrl=u.publicUrl;fileName=chatFile.name;}
-    chatFile=null;document.getElementById('chat-file-preview').style.display='none';
+    chatFile=null;const fp=document.getElementById('chat-file-preview');if(fp)fp.style.display='none';
   }
+  input.value='';
+  document.getElementById('chat-mention-dd').style.display='none';
   await sb.from('chat_messages').insert({channel_id:currentChannel.id,user_id:me.id,user_name:myProfile.full_name||me.email,content:content||'📎',file_url:fileUrl,file_name:fileName});
-  input.value='';document.getElementById('chat-mention-dd').style.display='none';
   await loadChatMessages();
 }
 
 function chatKeyDown(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatMessage();}}
-
-function setChatFile(input){
-  if(input.files[0]){chatFile=input.files[0];const p=document.getElementById('chat-file-preview');p.textContent='📎 '+chatFile.name;p.style.display='block';}
-}
+function setChatFile(input){if(input.files[0]){chatFile=input.files[0];const p=document.getElementById('chat-file-preview');if(p){p.textContent='📎 '+chatFile.name;p.style.display='block';}}}
 
 function handleChatMention(e){
-  const ta=document.getElementById('chat-input');const val=ta.value;
-  const tb=val.substring(0,ta.selectionStart);const m=tb.match(/@(\w*)$/);
-  const dd=document.getElementById('chat-mention-dd');
+  const ta=document.getElementById('chat-input');if(!ta)return;
+  const val=ta.value;const tb=val.substring(0,ta.selectionStart);const m=tb.match(/@(\w*)$/);
+  const dd=document.getElementById('chat-mention-dd');if(!dd)return;
   if(m){
     const q=m[1].toLowerCase();const matches=profiles.filter(p=>(p.full_name||'').toLowerCase().includes(q));
-    if(matches.length){dd.innerHTML=matches.map(p=>`<div class="mention-item" onclick="insertChatMention('${(p.full_name||p.id).replace(/'/g,"\\'")}')"><div class="mention-avatar">${avInitial(p.full_name)}</div>${p.full_name||p.id}</div>`).join('');dd.style.display='block';}
+    if(matches.length){dd.innerHTML=matches.map(p=>`<div class="mention-item" onclick="insertChatMention('${(p.full_name||p.id).replace(/'/g,"\\'")}')"><div class="mention-av">${avInitial(p.full_name)}</div>${p.full_name||p.id}</div>`).join('');dd.style.display='block';}
     else dd.style.display='none';
   }else dd.style.display='none';
 }
 
 function insertChatMention(name){
-  const ta=document.getElementById('chat-input');const val=ta.value;const c=ta.selectionStart;
+  const ta=document.getElementById('chat-input');if(!ta)return;
+  const val=ta.value;const c=ta.selectionStart;
   ta.value=val.substring(0,c).replace(/@(\w*)$/,'@'+name.replace(/ /g,'')+' ')+val.substring(c);
   document.getElementById('chat-mention-dd').style.display='none';ta.focus();
 }
@@ -1251,63 +1291,194 @@ async function createChannel(){
   showToast('Kanal oluşturuldu ✓','ok');await loadChannels();
 }
 
+// CHAT FONT
+function toggleChatSettings(){
+  const b=document.getElementById('chat-settings-bar');
+  if(b)b.style.display=b.style.display==='flex'?'none':'flex';
+}
+
+function applyChatFont(){
+  const font=document.getElementById('chat-font-select')?.value||chatFontSettings.font;
+  const size=parseInt(document.getElementById('chat-font-size')?.value||chatFontSettings.size);
+  const mine=document.getElementById('chat-color-mine')?.value||chatFontSettings.mine;
+  const other=document.getElementById('chat-color-other')?.value||chatFontSettings.other;
+  const lbl=document.getElementById('chat-font-size-label');if(lbl)lbl.textContent=size+'px';
+  chatFontSettings={font,size,mine,other};
+  localStorage.setItem('nexdo_chat_font',JSON.stringify(chatFontSettings));
+  let st=document.getElementById('chat-font-style');
+  if(!st){st=document.createElement('style');st.id='chat-font-style';document.head.appendChild(st);}
+  st.textContent=`.chat-bubble-full{font-family:${font}!important;font-size:${size}px!important;line-height:1.6!important;}.chat-msg-full.mine .chat-bubble-full{color:${mine}!important;}.chat-msg-full:not(.mine) .chat-bubble-full{color:${other}!important;}.comment-bubble{font-family:${font}!important;font-size:${Math.min(size,14)}px!important;}`;
+}
+
+// MEETINGS
+function renderMeetings(){
+  const q=(document.getElementById('meeting-search')?.value||'').toLowerCase();
+  const filtered=meetings.filter(m=>!q||m.title.toLowerCase().includes(q));
+  if(!filtered.length){document.getElementById('meeting-list').innerHTML='<div class="empty"><div class="empty-icon">📝</div>Toplantı notu bulunamadı</div>';return;}
+  document.getElementById('meeting-list').innerHTML=filtered.map(m=>`
+    <div class="meeting-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+      <div style="flex:1;"><div style="font-size:14px;font-weight:600;margin-bottom:4px;">${highlight(m.title,q)}</div><div style="font-size:12px;color:var(--gray-400);margin-bottom:6px;font-weight:500;">📅 ${fmtDate(m.meeting_date)} · 👥 ${m.people||''}</div><div style="font-size:13px;color:var(--gray-600);line-height:1.7;">${m.note||''}</div></div>
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+        ${can('telegram_send')?`<button class="icon-btn btn-tg" onclick="prepareTgMeeting('${m.id}')">✈ TG</button>`:''}
+        ${can('meeting_delete')?`<button class="icon-btn" style="color:var(--danger);" onclick="deleteMeeting('${m.id}')">✕</button>`:''}
+      </div>
+    </div></div>`).join('');
+}
+
+// USERS
+function renderUsers(){
+  const q=(document.getElementById('user-search')?.value||'').toLowerCase();
+  const filtered=profiles.filter(p=>!q||(p.full_name||'').toLowerCase().includes(q)||(p.email||'').toLowerCase().includes(q));
+  const el=document.getElementById('user-list');
+  if(!filtered.length){el.innerHTML='<div class="empty">Kullanıcı bulunamadı</div>';return;}
+  el.innerHTML=`<div style="background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;">
+    <table class="data-table">
+      <thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Rol</th><th>Durum</th><th>İşlem</th></tr></thead>
+      <tbody>${filtered.map((p,i)=>{
+        const roleObj=roles.find(r=>r.id===p.role_id);
+        return `<tr>
+          <td><div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;${avStyle(p.full_name,i)}">${avInitial(p.full_name)}</div><span style="font-weight:600;">${p.full_name||'İsimsiz'}</span></div></td>
+          <td style="font-size:12px;color:var(--gray-400);">${p.email||'—'}</td>
+          <td>${roleObj?`<span style="background:${roleObj.color}22;color:${roleObj.color};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${roleObj.name}</span>`:'<span class="badge badge-gray">Atanmamış</span>'}</td>
+          <td style="font-size:12px;">${statusIconHtml(p.status||'offline')}</td>
+          <td><div style="display:flex;gap:4px;">${can('user_manage')?`<button class="icon-btn" onclick="openAssignRoleModal('${p.id}','${(p.full_name||'').replace(/'/g,"\\'")}','${p.role_id||''}')">✏ Rol</button><button class="icon-btn" onclick="editUserInfo('${p.id}','${(p.full_name||'').replace(/'/g,"\\'")}')">✎ Düzenle</button>`:'—'}</div></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+async function editUserInfo(uid,currentName){
+  const newName=prompt('Ad Soyad:',currentName);
+  if(newName===null)return;
+  const {error}=await sb.from('profiles').update({full_name:newName}).eq('id',uid);
+  if(error){showToast('Hata: '+error.message,'err');return;}
+  showToast('Güncellendi ✓','ok');await loadProfiles();
+}
+
+// ROLES
+function renderRoles(){
+  const el=document.getElementById('roles-list');
+  if(!roles.length){el.innerHTML='<div class="empty">Henüz rol oluşturulmadı</div>';return;}
+  el.innerHTML=roles.map(r=>`<div class="role-card">
+    <div class="role-card-top"><div class="role-dot" style="background:${r.color}"></div><div style="font-size:16px;font-weight:700;flex:1;">${r.name}</div>
+    ${can('role_manage')?`<div style="display:flex;gap:6px;"><button class="icon-btn" onclick="openEditRole('${r.id}')">✏ Düzenle</button><button class="icon-btn" style="color:var(--danger);" onclick="deleteRole('${r.id}')">✕ Sil</button></div>`:''}</div>
+    <div class="perm-grid">${PERM_KEYS.map(k=>`<div class="perm-item"><span>${PERM_LABELS[k]}</span><span>${(r.permissions||{})[k]?'✅':'❌'}</span></div>`).join('')}</div>
+  </div>`).join('');
+}
+
+function renderTeams(){
+  const el=document.getElementById('team-list');if(!teams.length){el.innerHTML='<div class="empty">Henüz ekip oluşturulmadı</div>';return;}
+  el.innerHTML=teams.map(t=>{let m=[];try{m=t.members?JSON.parse(t.members):[];}catch(e){}
+    return `<div class="team-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div style="flex:1;"><div style="font-size:14px;font-weight:600;">${t.name}</div><div style="font-size:12px;color:var(--gray-400);">${t.description||''}</div><div class="team-members-list">${m.map(x=>`<span class="team-member-tag">👤 ${x}</span>`).join('')}</div></div>${can('team_manage')?`<button class="icon-btn" style="color:var(--danger);" onclick="deleteTeam('${t.id}')">✕</button>`:''}</div></div>`;
+  }).join('');
+}
+
+// DASHBOARD
+function renderDashboard(){
+  const active=tasks.filter(t=>!t.archived&&ACTIVE.includes(t.status||'beklemede'));
+  const done=tasks.filter(t=>t.status==='tamamlandi').length;
+  const rate=tasks.length?Math.round(done/tasks.length*100):0;
+  const urgent=active.filter(t=>dayDiff(t.deadline)<=3&&dayDiff(t.deadline)>=0).length;
+  const overdue=active.filter(t=>dayDiff(t.deadline)<0).length;
+  const pStats={};
+  Object.entries(assignees).forEach(([tid,names])=>{const t=tasks.find(t=>t.id===tid);if(!t)return;names.forEach(n=>{if(!pStats[n])pStats[n]={total:0,done:0};pStats[n].total++;if(t.status==='tamamlandi')pStats[n].done++;});});
+  const top=Object.entries(pStats).sort((a,b)=>b[1].total-a[1].total).slice(0,6);
+  const maxC=Math.max(...Object.values(STATUS_MAP).map((_,i)=>tasks.filter(t=>t.status===Object.keys(STATUS_MAP)[i]).length),1);
+  document.getElementById('dashboard-content').innerHTML=`
+    <div class="stat-row" style="grid-template-columns:repeat(5,minmax(0,1fr));">
+      <div class="stat-card"><div class="stat-label">Aktif Görev</div><div class="stat-val">${active.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Tamamlanan</div><div class="stat-val" style="color:var(--success);">${done}</div></div>
+      <div class="stat-card"><div class="stat-label">Devam Eden</div><div class="stat-val" style="color:#1D4ED8;">${active.filter(t=>t.status==='devam').length}</div></div>
+      <div class="stat-card"><div class="stat-label">Deadline Yakın</div><div class="stat-val" style="color:var(--warning);">${urgent}</div></div>
+      <div class="stat-card"><div class="stat-label">Gecikmiş</div><div class="stat-val" style="color:var(--danger);">${overdue}</div></div>
+    </div>
+    <div class="dash-grid">
+      <div class="dash-card"><div class="dash-card-title">Durum Dağılımı</div>${Object.entries(STATUS_MAP).map(([k,v])=>{const c=tasks.filter(t=>t.status===k).length;return `<div class="dash-bar-row"><span class="dash-bar-label">${v.l}</span><div class="dash-bar-wrap"><div class="dash-bar" style="width:${Math.round(c/Math.max(maxC,1)*100)}%"></div></div><span class="dash-bar-val">${c}</span></div>`;}).join('')}</div>
+      <div class="dash-card"><div class="dash-card-title">Özet</div>
+        <div class="dash-stat"><span class="dash-stat-label">Tamamlanma Oranı</span><span class="dash-stat-val" style="color:var(--success);">%${rate}</span></div>
+        <div class="dash-stat"><span class="dash-stat-label">Toplam Yorum</span><span class="dash-stat-val">${Object.values(comments).flat().length}</span></div>
+        <div class="dash-stat"><span class="dash-stat-label">Toplantı Notu</span><span class="dash-stat-val">${meetings.length}</span></div>
+        <div class="dash-stat"><span class="dash-stat-label">Aktif Kullanıcı</span><span class="dash-stat-val">${profiles.filter(p=>p.status==='online').length}</span></div>
+      </div>
+      ${top.length?`<div class="dash-card"><div class="dash-card-title">Kişi Bazlı</div>${top.map(([n,s])=>`<div class="dash-bar-row"><span class="dash-bar-label">${n}</span><div class="dash-bar-wrap"><div class="dash-bar" style="width:${Math.round(s.done/Math.max(s.total,1)*100)}%;background:var(--success);"></div></div><span class="dash-bar-val" style="font-size:11px;">${s.done}/${s.total}</span></div>`).join('')}</div>`:''}
+      <div class="dash-card"><div class="dash-card-title">Yaklaşan Deadlineler</div>${active.filter(t=>dayDiff(t.deadline)<=7&&dayDiff(t.deadline)>=0).sort((a,b)=>dayDiff(a.deadline)-dayDiff(b.deadline)).slice(0,6).map(t=>`<div class="dash-stat"><span class="dash-stat-label" style="flex:1;">${t.title.substring(0,28)}${t.title.length>28?'...':''}</span><span class="dash-stat-val" style="font-size:12px;color:var(--danger);">${dayDiff(t.deadline)} gün</span></div>`).join('')||'<div style="color:var(--gray-300);text-align:center;padding:16px;">Yaklaşan deadline yok 🎉</div>'}</div>
+    </div>`;
+}
+
+// CALENDAR
+function renderCalendar(){
+  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const days=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  const first=new Date(calYear,calMonth,1);const startDow=(first.getDay()+6)%7;
+  const today=new Date();today.setHours(0,0,0,0);
+  let html=`<div class="cal-wrap"><div class="cal-header"><button class="icon-btn" onclick="calNav(-1)">‹</button><div class="cal-month">${months[calMonth]} ${calYear}</div><button class="icon-btn" onclick="calNav(1)">›</button></div><div class="cal-grid">${days.map(d=>`<div class="cal-day-label">${d}</div>`).join('')}`;
+  let day=1-startDow;
+  for(let r=0;r<6;r++){
+    let hasDay=false;
+    for(let c=0;c<7;c++){
+      const date=new Date(calYear,calMonth,day);const isThisMonth=date.getMonth()===calMonth;if(isThisMonth)hasDay=true;
+      const isToday=date.getTime()===today.getTime();const dateStr=date.toISOString().split('T')[0];
+      const dt=tasks.filter(t=>t.deadline===dateStr&&ACTIVE.includes(t.status||'beklemede'));
+      html+=`<div class="cal-day ${isToday?'today':''} ${!isThisMonth?'other-month':''}"><div class="cal-day-num">${date.getDate()}</div>${dt.slice(0,2).map(t=>`<div class="cal-task-dot ${dayDiff(t.deadline)<=1?'urgent':''}">${t.title.substring(0,10)}${t.title.length>10?'...':''}</div>`).join('')}${dt.length>2?`<div style="font-size:10px;color:var(--gray-400);">+${dt.length-2}</div>`:''}</div>`;
+      day++;
+    }
+    if(!hasDay)break;
+  }
+  html+='</div></div>';
+  document.getElementById('calendar-content').innerHTML=html;
+}
+function calNav(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+
+// PROFILE
+function renderProfile(){
+  const n=myProfile.full_name||me.email;
+  document.getElementById('profile-avatar').textContent=avInitial(n);
+  document.getElementById('profile-name-display').textContent=n;
+  document.getElementById('profile-email-display').textContent=me.email;
+  document.getElementById('profile-name-input').value=myProfile.full_name||'';
+  const roleObj=roles.find(r=>r.id===myProfile.role_id);
+  document.getElementById('profile-role-badge').innerHTML=roleObj?`<span style="background:${roleObj.color}22;color:${roleObj.color};padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600;">${roleObj.name}</span>`:'';
+  document.getElementById('profile-msg').textContent='';
+  document.getElementById('profile-pass1').value='';document.getElementById('profile-pass2').value='';
+}
+async function updateProfile(){
+  const name=document.getElementById('profile-name-input').value.trim();if(!name)return;
+  await sb.from('profiles').update({full_name:name}).eq('id',me.id);
+  myProfile.full_name=name;document.getElementById('sb-name').textContent=name;document.getElementById('sb-av').textContent=avInitial(name);
+  document.getElementById('profile-name-display').textContent=name;showToast('Profil güncellendi ✓','ok');
+}
+async function updatePassword(){
+  const p1=document.getElementById('profile-pass1').value,p2=document.getElementById('profile-pass2').value;
+  const msg=document.getElementById('profile-msg');
+  if(p1.length<6){msg.className='auth-msg err';msg.textContent='En az 6 karakter';return;}
+  if(p1!==p2){msg.className='auth-msg err';msg.textContent='Şifreler eşleşmiyor';return;}
+  const {error}=await sb.auth.updateUser({password:p1});
+  if(error){msg.className='auth-msg err';msg.textContent=error.message;return;}
+  msg.className='auth-msg ok';msg.textContent='Şifre değiştirildi ✓';
+  document.getElementById('profile-pass1').value='';document.getElementById('profile-pass2').value='';
+}
+
 // TASK ACTIONS
-function toggleExpand(id){expandedId=expandedId===id?null:id;renderTasks();}
+function toggleExpand(id){expandedId=expandedId===id?null:id;renderCurrentTaskView();if(expandedId){setTimeout(()=>{const el=document.querySelector('.task-card.expanded');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},100);}}
 
 async function updateStatus(id,status){
   if(!can('task_status_change')){showToast('Yetkiniz yok','err');return;}
   await sb.from('tasks').update({status}).eq('id',id);
   const t=tasks.find(t=>t.id===id);if(t)t.status=status;
-  renderTasks();showToast('Durum güncellendi ✓','ok');
+  expandedId=id;renderCurrentTaskView();showToast('Durum güncellendi ✓','ok');
 }
 
 async function archiveTask(id){
   if(!can('task_archive')){showToast('Yetkiniz yok','err');return;}
-  if(!confirm('Bu görevi pasife almak istediğine emin misin?'))return;
+  if(!confirm('Bu görevi arşive taşımak istediğine emin misin?'))return;
   await sb.from('tasks').update({archived:true,archived_at:new Date().toISOString()}).eq('id',id);
-  tasks=tasks.map(t=>t.id===id?{...t,archived:true}:t);
-  expandedId=null;renderTasks();showToast('Görev arşive taşındı 🗄','ok');
+  tasks=tasks.map(t=>t.id===id?{...t,archived:true}:t);expandedId=null;renderCurrentTaskView();showToast('Arşive taşındı 🗄','ok');
 }
 
 async function restoreTask(id){
   await sb.from('tasks').update({archived:false,status:'beklemede'}).eq('id',id);
-  showToast('Görev geri alındı ✓','ok');await loadTasks();await loadArchive();
-}
-
-function buildPersonsList(containerId){
-  const wrap=document.getElementById(containerId);if(!wrap)return;
-  wrap.innerHTML=profiles.map((p,i)=>`
-    <div class="person-option" id="po-${containerId}-${p.id}" onclick="togglePersonSelect('${containerId}','${p.id}')">
-      <div class="person-avatar" style="${avStyle(p.full_name,i)}">${avInitial(p.full_name)}</div>
-      <span class="person-name">${p.full_name||'İsimsiz'}</span>
-      <div class="person-check" id="pc-${containerId}-${p.id}"></div>
-    </div>`).join('');
-}
-
-function togglePersonSelect(cid,pid){
-  const o=document.getElementById('po-'+cid+'-'+pid),c=document.getElementById('pc-'+cid+'-'+pid);
-  const s=o.classList.toggle('selected');c.classList.toggle('checked',s);c.textContent=s?'✓':'';
-}
-
-function getSelectedPersons(cid){return profiles.filter(p=>document.getElementById('po-'+cid+'-'+p.id)?.classList.contains('selected'));}
-
-async function addAssigneeFromSelect(taskId){
-  if(!can('task_assign')){showToast('Yetkiniz yok','err');return;}
-  const sel=document.getElementById('ai-sel-'+taskId);const pid=sel.value;if(!pid)return;
-  const profile=profiles.find(p=>p.id===pid);if(!profile)return;
-  const displayName=profile.full_name||profile.id.substring(0,8);
-  await sb.from('task_assignees').upsert({task_id:taskId,user_email:displayName});
-  if(!assignees[taskId])assignees[taskId]=[];
-  if(!assignees[taskId].includes(displayName))assignees[taskId].push(displayName);
-  sel.value='';expandedId=taskId;renderTasks();showToast('Kişi eklendi ✓','ok');
-  const task=tasks.find(t=>t.id===taskId);
-  if(profile.email?.includes('@'))sendEmail('assigned',profile.email,task?.title||'',me.email,task?.deadline,task?.priority);
-}
-
-async function removeAssignee(taskId,email){
-  await sb.from('task_assignees').delete().eq('task_id',taskId).eq('user_email',email);
-  if(assignees[taskId])assignees[taskId]=assignees[taskId].filter(e=>e!==email);
-  expandedId=taskId;renderTasks();
+  showToast('Geri alındı ✓','ok');await loadTasks();await loadArchive();
 }
 
 async function uploadTaskFiles(taskId,input){
@@ -1321,7 +1492,7 @@ async function uploadTaskFiles(taskId,input){
     if(!error){const {data:u}=sb.storage.from('attachments').getPublicUrl(path);existing.push({name:file.name,url:u.publicUrl});}
   }
   await sb.from('tasks').update({files:JSON.stringify(existing)}).eq('id',taskId);
-  if(t)t.files=JSON.stringify(existing);expandedId=taskId;renderTasks();showToast('Dosya eklendi ✓','ok');
+  if(t)t.files=JSON.stringify(existing);expandedId=taskId;renderCurrentTaskView();showToast('Dosya eklendi ✓','ok');
 }
 
 function setCommentFile(input,taskId){
@@ -1331,7 +1502,7 @@ function setCommentFile(input,taskId){
 function commentKeyDown(e,taskId){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addComment(taskId);}}
 
 async function addComment(taskId){
-  const inp=document.getElementById('ci-'+taskId);const content=inp.value.trim();
+  const inp=document.getElementById('ci-'+taskId);const content=inp?.value?.trim();
   if(!content&&!commentFiles[taskId])return;
   let fileUrl=null,fileName=null;
   if(commentFiles[taskId]){
@@ -1343,11 +1514,10 @@ async function addComment(taskId){
   const {data,error}=await sb.from('comments').insert({task_id:taskId,user_id:me.id,user_email:me.email,content:content||'📎',file_url:fileUrl,file_name:fileName}).select().single();
   if(error){showToast('Yorum eklenemedi','err');return;}
   if(!comments[taskId])comments[taskId]=[];comments[taskId].push(data);
-  inp.value='';expandedId=taskId;renderTasks();
-  // Scroll to bottom
-  setTimeout(()=>{const ca=document.getElementById('chat-area-'+taskId);if(ca)ca.scrollTop=ca.scrollHeight;},50);
+  if(inp)inp.value='';expandedId=taskId;renderCurrentTaskView();
+  setTimeout(()=>{const cl=document.getElementById('clist-'+taskId);if(cl)cl.scrollTop=cl.scrollHeight;},50);
   const task=tasks.find(t=>t.id===taskId);
-  const mentions=content.match(/@(\S+)/g)||[];
+  const mentions=(content||'').match(/@(\S+)/g)||[];
   for(const m of mentions){const n=m.replace('@','');const p=profiles.find(p=>(p.full_name||'').replace(/ /g,'')===n);if(p?.email?.includes('@'))sendEmail('mentioned',p.email,task?.title||'',me.email,null,null);}
 }
 
@@ -1356,7 +1526,7 @@ function handleTaskMention(e,taskId){
   const val=ta.value;const tb=val.substring(0,ta.selectionStart);const m=tb.match(/@(\w*)$/);
   const dd=document.getElementById('mention-dd-'+taskId);if(!dd)return;
   if(m){const q=m[1].toLowerCase();const matches=profiles.filter(p=>(p.full_name||'').toLowerCase().includes(q));
-    if(matches.length){dd.innerHTML=matches.map(p=>`<div class="mention-item" onclick="insertTaskMention('${taskId}','${(p.full_name||p.id).replace(/'/g,"\\'")}')"><div class="mention-avatar">${avInitial(p.full_name)}</div>${p.full_name||p.id}</div>`).join('');dd.style.display='block';}
+    if(matches.length){dd.innerHTML=matches.map(p=>`<div class="mention-item" onclick="insertTaskMention('${taskId}','${(p.full_name||p.id).replace(/'/g,"\\'")}')"><div class="mention-av">${avInitial(p.full_name)}</div>${p.full_name||p.id}</div>`).join('');dd.style.display='block';}
     else dd.style.display='none';
   }else dd.style.display='none';
 }
@@ -1370,14 +1540,14 @@ function insertTaskMention(taskId,name){
 
 function previewFiles(input){
   selectedFiles=Array.from(input.files);
-  document.getElementById('f-file-list').innerHTML=selectedFiles.map(f=>`<span style="font-size:11px;background:${f.size>10*1024*1024?'#FCEBEB;color:#A32D2D':'#f0f0ea;color:#555'};padding:2px 8px;border-radius:5px;">📎 ${f.name}</span>`).join('');
+  document.getElementById('f-file-list').innerHTML=selectedFiles.map(f=>`<span style="font-size:11px;background:${f.size>10*1024*1024?'var(--danger-light);color:var(--danger)':'var(--gray-100);color:var(--gray-600)'};padding:2px 8px;border-radius:var(--radius);">📎 ${f.name}</span>`).join('');
 }
 
 function onVisibilityChange(){
-  const val=document.getElementById('f-visibility').value;
-  document.getElementById('f-team-group').style.display=val==='team'?'block':'none';
+  document.getElementById('f-team-group').style.display=document.getElementById('f-visibility').value==='team'?'block':'none';
 }
 
+// ADD TASK
 async function addTask(){
   if(!can('task_create')){showToast('Yetkiniz yok','err');return;}
   const title=document.getElementById('f-title').value.trim();if(!title){showToast('Başlık gerekli!','err');return;}
@@ -1432,7 +1602,7 @@ async function addUser(){
   const {data,error}=await sb.auth.signUp({email,password:pass});
   if(error){showToast('Hata: '+error.message,'err');return;}
   if(data.user)await sb.from('profiles').upsert({id:data.user.id,full_name:fname+' '+lname,email,role_id:roleId||null,status:'offline',last_seen:new Date().toISOString(),must_change_password:true,created_by_admin:true});
-  closeModal('addUserModal');['au-fname','au-lname','au-email','au-pass'].forEach(id=>document.getElementById(id).value='');
+  closeModal('addUserModal');['au-fname','au-lname','au-email','au-pass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   showToast('Kullanıcı eklendi ✓','ok');await loadProfiles();
 }
 
@@ -1445,42 +1615,15 @@ async function addTeam(){
   showToast('Ekip oluşturuldu ✓','ok');await loadTeams();showView('teams');
 }
 
-async function deleteTeam(id){
-  if(!can('team_manage')){showToast('Yetkiniz yok','err');return;}
-  if(!confirm('Ekip silinsin mi?'))return;
-  await sb.from('teams').delete().eq('id',id);showToast('Silindi','ok');await loadTeams();
-}
-
-async function deleteMeeting(id){
-  if(!can('meeting_delete')){showToast('Yetkiniz yok','err');return;}
-  if(!confirm('Silinsin mi?'))return;
-  await sb.from('meetings').delete().eq('id',id);showToast('Silindi','ok');await loadMeetings();
-}
+async function deleteTeam(id){if(!confirm('Ekip silinsin mi?'))return;await sb.from('teams').delete().eq('id',id);showToast('Silindi','ok');await loadTeams();}
+async function deleteMeeting(id){if(!confirm('Silinsin mi?'))return;await sb.from('meetings').delete().eq('id',id);showToast('Silindi','ok');await loadMeetings();}
 
 async function editNote(id,cur){
   const n=prompt('Notu güncelle:',cur);
-  if(n!==null){await sb.from('tasks').update({note:n}).eq('id',id);const t=tasks.find(t=>t.id===id);if(t)t.note=n;showToast('Güncellendi ✓','ok');expandedId=id;renderTasks();}
+  if(n!==null){await sb.from('tasks').update({note:n}).eq('id',id);const t=tasks.find(t=>t.id===id);if(t)t.note=n;showToast('Güncellendi ✓','ok');expandedId=id;renderCurrentTaskView();}
 }
 
-async function updateProfile(){
-  const name=document.getElementById('profile-name-input').value.trim();if(!name){showToast('İsim gerekli!','err');return;}
-  await sb.from('profiles').update({full_name:name}).eq('id',me.id);
-  myProfile.full_name=name;document.getElementById('sb-name').textContent=name;document.getElementById('profile-name-display').textContent=name;
-  showToast('Profil güncellendi ✓','ok');
-}
-
-async function updatePassword(){
-  const p1=document.getElementById('profile-pass1').value,p2=document.getElementById('profile-pass2').value;
-  const msg=document.getElementById('profile-msg');
-  if(p1.length<6){msg.className='auth-msg err';msg.textContent='En az 6 karakter';return;}
-  if(p1!==p2){msg.className='auth-msg err';msg.textContent='Şifreler eşleşmiyor';return;}
-  const {error}=await sb.auth.updateUser({password:p1});
-  if(error){msg.className='auth-msg err';msg.textContent=error.message;return;}
-  msg.className='auth-msg ok';msg.textContent='Şifre değiştirildi ✓';
-  document.getElementById('profile-pass1').value='';document.getElementById('profile-pass2').value='';
-}
-
-// ROLE
+// ROLE MANAGEMENT
 function selectColor(el){document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');selectedColor=el.dataset.color;}
 function togglePerm(btn){btn.classList.toggle('on');btn.classList.toggle('off');}
 function getPermissionsFromModal(){const p={};PERM_KEYS.forEach(k=>{const el=document.getElementById('perm-'+k);if(el)p[k]=el.classList.contains('on');});return p;}
@@ -1488,7 +1631,7 @@ function setPermissionsInModal(p){PERM_KEYS.forEach(k=>{const el=document.getEle
 
 function openRoleModal(){
   document.getElementById('role-modal-title').textContent='Yeni Rol';document.getElementById('rc-id').value='';document.getElementById('rc-name').value='';
-  selectedColor='#A32D2D';document.querySelectorAll('.color-swatch').forEach((s,i)=>s.classList.toggle('selected',i===0));
+  selectedColor='#B91C1C';document.querySelectorAll('.color-swatch').forEach((s,i)=>s.classList.toggle('selected',i===0));
   PERM_KEYS.forEach(k=>{const el=document.getElementById('perm-'+k);if(el){el.classList.remove('on');el.classList.add('off');}});
   openModal('roleModal');
 }
@@ -1503,8 +1646,8 @@ function openEditRole(id){
 async function saveRole(){
   const name=document.getElementById('rc-name').value.trim();if(!name){showToast('Rol adı gerekli!','err');return;}
   const perms=getPermissionsFromModal();const eid=document.getElementById('rc-id').value;
-  if(eid)await sb.from('roles').update({name,color:selectedColor,permissions:perms}).eq('id',eid);
-  else await sb.from('roles').insert({name,color:selectedColor,permissions:perms});
+  if(eid){await sb.from('roles').update({name,color:selectedColor,permissions:perms}).eq('id',eid);}
+  else{await sb.from('roles').insert({name,color:selectedColor,permissions:perms});}
   closeModal('roleModal');await loadRoles();renderRoles();showToast('Rol kaydedildi ✓','ok');
 }
 
@@ -1525,34 +1668,37 @@ async function assignRole(){
   showToast('Rol atandı ✓','ok');closeModal('assignRoleModal');await loadProfiles();
 }
 
-async function aiResearch(taskId,title){
-  const le=document.getElementById('ai-load-'+taskId),re=document.getElementById('ai-res-'+taskId);
-  if(!le||!re)return;le.style.display='block';re.style.display='none';
-  try{
-    const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title})});
-    const data=await res.json();le.style.display='none';
-    re.innerHTML=(data.result||data.error||'Sonuç alınamadı.').replace(/\n/g,'<br>');re.style.display='block';
-  }catch(e){le.style.display='none';re.textContent='Bağlantı hatası';re.style.display='block';}
+// PERSON SELECT
+function buildPersonsList(cid){
+  const wrap=document.getElementById(cid);if(!wrap)return;
+  wrap.innerHTML=profiles.map((p,i)=>`
+    <div class="person-option" id="po-${cid}-${p.id}" onclick="togglePersonSelect('${cid}','${p.id}')">
+      <div class="person-avatar" style="${avStyle(p.full_name,i)}">${avInitial(p.full_name)}</div>
+      <span class="person-name">${p.full_name||'İsimsiz'}</span>
+      <div class="person-check" id="pc-${cid}-${p.id}"></div>
+    </div>`).join('');
 }
+function togglePersonSelect(cid,pid){const o=document.getElementById('po-'+cid+'-'+pid);const c=document.getElementById('pc-'+cid+'-'+pid);const s=o.classList.toggle('selected');c.classList.toggle('checked',s);c.textContent=s?'✓':'';}
+function getSelectedPersons(cid){return profiles.filter(p=>document.getElementById('po-'+cid+'-'+p.id)?.classList.contains('selected'));}
 
+// TG
 function prepareTg(type,title,date,priority,status){
   const d=dayDiff(date);const pl=priority==='acil'?'🔴 Acil':priority==='orta'?'🟡 Orta':'🟢 Düşük';
   const sl=STATUS_MAP[status]?.l||'';let dl=date?`\n📅 Deadline: ${fmtDate(date)}`:'';
   if(date&&d<=3&&d>=0)dl+=` (⏰ ${d} gün kaldı!)`;if(date&&d<0)dl+=` (⚠ ${Math.abs(d)} gün geçti!)`;
   pendingTgMsg=`📋 Görev Hatırlatması\n\n${title}\n${pl} · ${sl}${dl}`;
-  const p=document.getElementById('tg-msg-preview');p.textContent=pendingTgMsg;p.style.display='block';
-  const saved=localStorage.getItem('tg_chat_id');if(saved)document.getElementById('tg-chat-input').value=saved;
-  openModal('tgModal');
+  showTgModal();
 }
-
 function prepareTgMeeting(mid){
   const m=meetings.find(x=>x.id===mid);if(!m)return;
   pendingTgMsg=`📝 Toplantı Notu\n\n${m.title}\n📅 ${fmtDate(m.meeting_date)}\n👥 ${m.people||''}\n\n${m.note||''}`;
+  showTgModal();
+}
+function showTgModal(){
   const p=document.getElementById('tg-msg-preview');p.textContent=pendingTgMsg;p.style.display='block';
   const saved=localStorage.getItem('tg_chat_id');if(saved)document.getElementById('tg-chat-input').value=saved;
   openModal('tgModal');
 }
-
 async function confirmSendTelegram(){
   const chatId=document.getElementById('tg-chat-input').value.trim();if(!chatId){showToast('Chat ID gerekli!','err');return;}
   localStorage.setItem('tg_chat_id',chatId);
@@ -1568,55 +1714,37 @@ async function sendEmail(type,to,taskTitle,assignedBy,deadline,priority){
   try{await fetch('/api/notify-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,to,taskTitle,assignedBy,deadline,priority})});}catch(e){}
 }
 
-function setFilter(f,btn){
-  currentFilter=f;currentPage=1;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('active-filter'));
-  if(btn)btn.classList.add('active');
-  else{const sc={all:'sc-total',devam:'sc-active',urgent:'sc-urgent',tamamlandi:'sc-done'}[f];if(sc)document.getElementById(sc)?.classList.add('active-filter');}
-  renderTasks();
-}
-
-function setTaskView(v){
-  taskView=v;
-  document.getElementById('vbtn-list').classList.toggle('active',v==='list');
-  document.getElementById('vbtn-kanban').classList.toggle('active',v==='kanban');
-  document.getElementById('task-kanban').style.display=v==='kanban'?'block':'none';
-  renderTasks();
+async function aiResearch(taskId,title){
+  const le=document.getElementById('ai-load-'+taskId),re=document.getElementById('ai-res-'+taskId);
+  if(!le||!re)return;le.style.display='block';re.style.display='none';
+  try{
+    const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title})});
+    const data=await res.json();le.style.display='none';
+    re.innerHTML=(data.result||data.error||'Sonuç alınamadı.').replace(/\n/g,'<br>');re.style.display='block';
+  }catch(e){le.style.display='none';re.textContent='Bağlantı hatası';re.style.display='block';}
 }
 
 function showView(v){
-  ['tasks','dashboard','calendar','chat','meetings','archive','users','roles','teams','profile'].forEach(n=>{
+  ['dashboard','tasks','calendar','chat','meetings','archive','users','roles','teams','profile'].forEach(n=>{
     const el=document.getElementById('view-'+n);if(el)el.style.display=n===v?'block':'none';
     const nav=document.getElementById('nav-'+n);if(nav)nav.classList.toggle('active',n===v);
   });
-  // tasks alt menü
-  const tMenu=document.getElementById('task-submenu');
-  if(tMenu)tMenu.style.display=v==='tasks'?'block':'none';
   if(v==='dashboard')renderDashboard();
   if(v==='calendar')renderCalendar();
-  if(v==='chat'){loadChannels();}
+  if(v==='chat')loadChannels();
   if(v==='archive')loadArchive();
   if(v==='users')loadProfiles();
   if(v==='teams')loadTeams();
   if(v==='roles'){loadRoles().then(()=>renderRoles());}
   if(v==='profile')renderProfile();
+  if(v==='tasks'&&!taskMenuOpen){taskMenuOpen=true;const m=document.getElementById('task-submenu');if(m)m.style.display='block';const a=document.getElementById('task-arrow');if(a)a.style.transform='rotate(90deg)';}
 }
 
 function openModal(id){
   document.getElementById(id).classList.add('show');
   const today=new Date().toISOString().split('T')[0];
-  if(id==='taskModal'){
-    document.getElementById('f-start').value=today;document.getElementById('f-deadline').value=today;
-    document.getElementById('f-visibility').value='all';document.getElementById('f-team-group').style.display='none';
-    buildPersonsList('f-persons-list');
-  }
-  if(id==='meetingModal'){
-    document.getElementById('m-date').value=today;
-    document.getElementById('m-participants-list').innerHTML=
-      teams.map(t=>`<label><input type="checkbox" value="${t.name} ekibi"/> 🏷 ${t.name}</label>`).join('')+
-      profiles.map(p=>`<label><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');
-  }
+  if(id==='taskModal'){document.getElementById('f-start').value=today;document.getElementById('f-deadline').value=today;document.getElementById('f-visibility').value='all';document.getElementById('f-team-group').style.display='none';buildPersonsList('f-persons-list');}
+  if(id==='meetingModal'){document.getElementById('m-date').value=today;document.getElementById('m-participants-list').innerHTML=teams.map(t=>`<label><input type="checkbox" value="${t.name} ekibi"/> 🏷 ${t.name}</label>`).join('')+profiles.map(p=>`<label><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');}
   if(id==='teamModal')document.getElementById('team-member-checkboxes').innerHTML=profiles.map(p=>`<label><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');
   if(id==='addUserModal')document.getElementById('au-role').innerHTML=roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
   if(id==='newChannelModal')document.getElementById('nc-members').innerHTML=profiles.map(p=>`<label><input type="checkbox" value="${p.id}"/> ${p.full_name||p.email||'İsimsiz'}</label>`).join('');
@@ -1628,167 +1756,23 @@ let toastTimeout=null;
 function showToast(msg,type='ok'){
   const t=document.getElementById('toast'),icon=document.getElementById('toast-icon'),msgEl=document.getElementById('toast-msg');
   icon.textContent=type==='ok'?'✓':type==='err'?'✕':'ℹ';
-  icon.style.cssText=`font-size:13px;${type==='err'?'color:#F7C1C1;':type==='info'?'color:#85B7EB;':'color:#C0DD97;'}`;
-  msgEl.textContent=msg;t.style.background=type==='err'?'#A32D2D':type==='info'?'#185FA5':'#1a1a1a';
+  icon.style.cssText=`font-size:14px;font-weight:700;${type==='err'?'color:#FCA5A5;':type==='info'?'color:#93C5FD;':'color:#86EFAC;'}`;
+  msgEl.textContent=msg;t.style.background=type==='err'?'#7F1D1D':type==='info'?'#1E3A8A':'var(--gray-900)';
   t.classList.add('show');if(toastTimeout)clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
 document.addEventListener('click',function(e){
-  document.querySelectorAll('.mention-dropdown').forEach(dd=>{if(!dd.contains(e.target)&&!e.target.classList.contains('comment-input')&&!e.target.classList.contains('chat-input-full'))dd.style.display='none';});
+  // Mention dropdown kapat
+  document.querySelectorAll('.mention-dropdown,.chat-mention-dd').forEach(dd=>{
+    if(!dd.contains(e.target)&&!e.target.classList.contains('comment-textarea')&&!e.target.classList.contains('chat-input-full'))dd.style.display='none';
+  });
+  // Assignee dropdown kapat
+  document.querySelectorAll('.assignee-dropdown').forEach(dd=>{
+    if(!dd.contains(e.target)&&!e.target.classList.contains('add-assignee-btn'))dd.style.display='none';
+  });
+  // Modal dışına tıkla kapat
   document.querySelectorAll('.modal-overlay').forEach(m=>{if(e.target===m)m.classList.remove('show');});
 });
-
-// EKİP DURUMU
-function renderTeamStatus(){
-  const el=document.getElementById('team-status-list');
-  if(!el)return;
-  const others=profiles.filter(p=>p.id!==me?.id).slice(0,8);
-  if(!others.length){el.innerHTML='<div style="font-size:11px;color:#aaa;padding:2px 4px;">Henüz kimse yok</div>';return;}
-  el.innerHTML=others.map((p,i)=>{
-    const dotClass=p.status==='online'?'ts-dot-online':p.status==='away'?'ts-dot-away':'ts-dot-offline';
-    const avColors=['#EEEDFE','#E1F5EE','#FAEEDA','#FAECE7','#E6F1FB'];
-    const avTexts=['#3C3489','#0F6E56','#854F0B','#993C1D','#185FA5'];
-    const idx=i%5;
-    return `<div class="team-status-item" title="${p.status==='online'?'Çevrimiçi':p.status==='away'?'Mola':'Çevrimdışı'}">
-      <div class="ts-av" style="background:${avColors[idx]};color:${avTexts[idx]}">${(p.full_name||'?')[0].toUpperCase()}</div>
-      <span class="ts-name">${p.full_name||p.email||'İsimsiz'}</span>
-      <div class="ts-dot ${dotClass}"></div>
-    </div>`;
-  }).join('');
-}
-
-// SES BİLDİRİMİ
-let audioCtx=null;
-function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
-function playNotifSound(){
-  try{
-    initAudio();
-    const osc=audioCtx.createOscillator();
-    const gain=audioCtx.createGain();
-    osc.connect(gain);gain.connect(audioCtx.destination);
-    osc.frequency.setValueAtTime(880,audioCtx.currentTime);
-    osc.frequency.setValueAtTime(1100,audioCtx.currentTime+0.1);
-    gain.gain.setValueAtTime(0.3,audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);
-    osc.start(audioCtx.currentTime);osc.stop(audioCtx.currentTime+0.3);
-  }catch(e){}
-}
-
-// GÖREV MENÜSÜ
-let taskMenuOpen = false;
-function toggleTaskMenu(){
-  taskMenuOpen = !taskMenuOpen;
-  const menu = document.getElementById('task-submenu');
-  const arrow = document.getElementById('task-menu-arrow');
-  const navTasks = document.getElementById('nav-tasks');
-  if(menu) menu.style.display = taskMenuOpen ? 'block' : 'none';
-  if(arrow) arrow.style.transform = taskMenuOpen ? 'rotate(90deg)' : '';
-  if(taskMenuOpen){
-    showView('tasks');
-    navTasks.classList.add('active');
-  }
-}
-
-function showTaskStatus(status){
-  document.querySelectorAll('.nav-subitem').forEach(el => el.classList.remove('active-sub'));
-  const sub = document.getElementById('sub-' + status);
-  if(sub) sub.classList.add('active-sub');
-  showView('tasks');
-  document.getElementById('nav-tasks').classList.add('active');
-  // Filtre uygula
-  if(status === 'all'){
-    // Tüm aktif görevler
-    currentFilter = 'all';
-    currentPage = 1;
-    // Ana sayfa filtresi - arşiv ve tamamlandı/iptal hariç
-    renderTasksForStatus(null);
-  } else if(['tamamlandi','iptal'].includes(status)){
-    // Bu statüler için arşivden de göster
-    renderTasksForStatus(status);
-  } else {
-    currentFilter = status;
-    currentPage = 1;
-    renderTasksForStatus(status);
-  }
-}
-
-function renderTasksForStatus(status){
-  const q = (document.getElementById('task-search')?.value||'').toLowerCase().trim();
-  let filtered;
-  if(!status || status === 'all'){
-    filtered = sortTasks(tasks.filter(t => !t.archived && ACTIVE_STATUSES.includes(t.status||'beklemede') && (!q || t.title.toLowerCase().includes(q))));
-  } else if(['tamamlandi','iptal'].includes(status)){
-    filtered = tasks.filter(t => t.status === status && (!q || t.title.toLowerCase().includes(q)));
-  } else {
-    filtered = sortTasks(tasks.filter(t => !t.archived && (t.status||'beklemede') === status && (!q || t.title.toLowerCase().includes(q))));
-  }
-  
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  if(currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-  const paged = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
-  
-  document.getElementById('s-total').textContent = tasks.filter(t=>!t.archived&&ACTIVE_STATUSES.includes(t.status||'beklemede')).length;
-  document.getElementById('s-active').textContent = tasks.filter(t=>t.status==='devam').length;
-  document.getElementById('s-done').textContent = tasks.filter(t=>t.status==='tamamlandi').length;
-  document.getElementById('s-urgent').textContent = tasks.filter(t=>!t.archived&&ACTIVE_STATUSES.includes(t.status||'beklemede')&&dayDiff(t.deadline)<=3&&dayDiff(t.deadline)>=0).length;
-
-  if(!paged.length){
-    document.getElementById('task-list').innerHTML = '<div class="empty"><div class="empty-icon">📋</div>Bu kategoride görev yok</div>';
-    document.getElementById('task-pagination').innerHTML = '';
-    return;
-  }
-  document.getElementById('task-list').innerHTML = paged.map(t => renderTaskCard(t, q)).join('');
-  document.getElementById('task-pagination').innerHTML = totalPages > 1 ? 
-    '<div class="pagination">'+Array.from({length:totalPages},(_,i)=>`<button class="page-btn ${i+1===currentPage?'active':''}" onclick="currentPage=${i+1};renderTasksForStatus('${status||'all'}')">${i+1}</button>`).join('')+'<span style="font-size:12px;color:#aaa;margin-left:8px;">'+filtered.length+' görev</span></div>' : '';
-}
-
-// CHAT FONT AYARLARI
-let chatFontSettings = JSON.parse(localStorage.getItem('nexdo_chat_font') || '{"font":"system-ui,-apple-system","size":13,"colorMine":"#ffffff","colorOther":"#1a1a1a"}');
-
-function toggleChatSettings(){
-  const bar = document.getElementById('chat-settings-bar');
-  if(bar) bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
-}
-
-function applyChatFont(){
-  const font = document.getElementById('chat-font-select')?.value || chatFontSettings.font;
-  const size = parseInt(document.getElementById('chat-font-size')?.value || chatFontSettings.size);
-  const colorMine = document.getElementById('chat-font-color-mine')?.value || chatFontSettings.colorMine;
-  const colorOther = document.getElementById('chat-font-color-other')?.value || chatFontSettings.colorOther;
-  const label = document.getElementById('chat-font-size-label');
-  if(label) label.textContent = size + 'px';
-  chatFontSettings = {font, size, colorMine, colorOther};
-  localStorage.setItem('nexdo_chat_font', JSON.stringify(chatFontSettings));
-  // CSS değişkenlerini uygula
-  const style = document.getElementById('chat-font-style') || (() => {
-    const s = document.createElement('style');s.id='chat-font-style';document.head.appendChild(s);return s;
-  })();
-  style.textContent = `.chat-bubble-full{font-family:${font}!important;font-size:${size}px!important;line-height:1.6!important;}.chat-msg-full.mine .chat-bubble-full{color:${colorMine}!important;}.chat-msg-full:not(.mine) .chat-bubble-full{color:${colorOther}!important;}.chat-bubble{font-family:${font}!important;font-size:${size}px!important;}.chat-msg.mine .chat-bubble{color:${colorMine}!important;}.chat-msg:not(.mine) .chat-bubble{color:${colorOther}!important;}`;
-}
-
-function initChatFont(){
-  const fs = document.getElementById('chat-font-select');
-  const fsz = document.getElementById('chat-font-size');
-  const cm = document.getElementById('chat-font-color-mine');
-  const co = document.getElementById('chat-font-color-other');
-  if(fs) fs.value = chatFontSettings.font;
-  if(fsz) fsz.value = chatFontSettings.size;
-  if(cm) cm.value = chatFontSettings.colorMine;
-  if(co) co.value = chatFontSettings.colorOther;
-  applyChatFont();
-}
-
-// KULLANICI DÜZENLEME (Admin)
-async function editUserInfo(uid, currentName, currentEmail){
-  const newName = prompt('Ad Soyad:', currentName);
-  if(newName === null) return;
-  const newEmail = prompt('E-posta:', currentEmail);
-  if(newEmail === null) return;
-  const {error} = await sb.from('profiles').update({full_name:newName, email:newEmail}).eq('id', uid);
-  if(error){showToast('Hata: '+error.message, 'err');return;}
-  showToast('Kullanıcı güncellendi ✓', 'ok');
-  await loadProfiles();
-}
 
 init();
 </script>

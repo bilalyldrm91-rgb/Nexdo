@@ -462,6 +462,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
 
     <div class="nav-item" id="nav-calendar" onclick="showView('calendar')"><span class="nav-icon">📅</span> Takvim</div>
     <div class="nav-item" id="nav-chat" onclick="showView('chat')"><span class="nav-icon">💬</span> Chat <span class="nav-badge" id="chat-badge" style="display:none;">!</span></div>
+    <div class="nav-item" id="nav-notifications" onclick="showView('notifications')"><span class="nav-icon">🔔</span> Bildirimler <span class="nav-badge" id="notif-badge" style="display:none;">0</span></div>
     <div class="nav-item" id="nav-meetings" onclick="showView('meetings')"><span class="nav-icon">📝</span> Toplantılar</div>
 
     <div class="nav-sep"></div>
@@ -511,7 +512,17 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
   <div class="main">
     <!-- DASHBOARD -->
     <div id="view-dashboard">
-      <div class="header"><h1>Dashboard</h1><button class="btn-secondary" onclick="renderDashboard()">↻ Yenile</button></div>
+      <div class="header"><h1>Dashboard</h1>
+        <div class="header-actions">
+          <select id="dash-period" class="form-input" style="width:auto;padding:7px 12px;font-size:13px;" onchange="renderDashboard()">
+            <option value="all">Tüm Zamanlar</option>
+            <option value="7">Son 7 Gün</option>
+            <option value="30">Son 30 Gün</option>
+            <option value="90">Son 90 Gün</option>
+          </select>
+          <button class="btn-secondary" onclick="renderDashboard()">↻ Yenile</button>
+        </div>
+      </div>
       <div id="dashboard-content"></div>
     </div>
 
@@ -587,6 +598,12 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div id="view-notifications" style="display:none;">
+      <div class="header"><h1>🔔 Bildirimler</h1><button class="btn-secondary" onclick="markAllRead()">Tümünü Okundu İşaretle</button></div>
+      <div id="notifications-list"></div>
     </div>
 
     <!-- MEETINGS -->
@@ -850,10 +867,47 @@ function showScreen(s){
   document.getElementById('app-screen').style.display=s==='app'?'flex':'none';
 }
 
+let sessionCheckInterval=null;
+function startSessionCheck(){
+  if(sessionCheckInterval)clearInterval(sessionCheckInterval);
+  sessionCheckInterval=setInterval(async()=>{
+    if(!me)return;
+    const localToken=localStorage.getItem('nexdo_session_token');
+    const {data}=await sb.from('profiles').select('session_token').eq('id',me.id).single();
+    if(data&&data.session_token&&data.session_token!==localToken){
+      // Başka cihazdan giriş yapılmış
+      clearInterval(sessionCheckInterval);
+      showSecurityLogoutModal();
+    }
+  },15000); // 15 saniyede bir kontrol
+}
+
+function showSecurityLogoutModal(){
+  // Tüm ekranların üstüne güvenlik modalı
+  const overlay=document.createElement('div');
+  overlay.className='security-overlay';
+  overlay.innerHTML=`<div style="background:#fff;border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="font-size:48px;margin-bottom:16px;">🔐</div>
+    <div style="font-size:18px;font-weight:700;color:var(--gray-900);margin-bottom:8px;">Güvenlik Uyarısı</div>
+    <div style="font-size:14px;color:var(--gray-500);margin-bottom:24px;line-height:1.6;">Hesabınıza başka bir cihazdan giriş yapıldı. Güvenliğiniz için bu oturum kapatıldı.</div>
+    <button onclick="forceLogout()" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Tamam, Giriş Sayfasına Git</button>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
 function cleanup(){
   if(statusInterval)clearInterval(statusInterval);
+  if(sessionCheckInterval)clearInterval(sessionCheckInterval);
   if(realtimeChannel)sb.removeChannel(realtimeChannel);
   if(chatRealtime)sb.removeChannel(chatRealtime);
+}
+
+async function forceLogout(){
+  cleanup();
+  localStorage.removeItem('nexdo_session_token');
+  await sb.auth.signOut();
+  document.querySelectorAll('.security-overlay').forEach(el=>el.remove());
+  showScreen('auth');
 }
 
 async function afterLogin(){
@@ -865,16 +919,26 @@ async function afterLogin(){
   }
   myProfile=p;
   if(myProfile.must_change_password){showScreen('change-pass');return;}
-  await sb.from('profiles').update({status:'online',last_seen:new Date().toISOString(),email:me.email}).eq('id',me.id);
-  myProfile.status='online';myProfile.email=me.email;
+
+  // TEK OTURUM: yeni token oluştur, eski oturumu geçersiz kıl
+  const newToken=Math.random().toString(36).substring(2)+Date.now().toString(36);
+  localStorage.setItem('nexdo_session_token',newToken);
+  await sb.from('profiles').update({
+    status:'online',last_seen:new Date().toISOString(),
+    email:me.email,session_token:newToken
+  }).eq('id',me.id);
+  myProfile.status='online';myProfile.email=me.email;myProfile.session_token=newToken;
+
   if(myProfile.role_id){const role=roles.find(r=>r.id===myProfile.role_id);myPerms=role?.permissions||{};}
   else PERM_KEYS.forEach(k=>myPerms[k]=true);
   setupSidebar();
   await Promise.all([loadTasks(),loadMeetings(),loadProfiles(),loadTeams(),loadChannels()]);
   setupRealtime();
+  startSessionCheck();
   showScreen('app');
   showView('dashboard');
   applyChatFont();
+  setTimeout(checkDeadlineNotifications,2000);
   if(statusInterval)clearInterval(statusInterval);
   statusInterval=setInterval(()=>sb.from('profiles').update({last_seen:new Date().toISOString()}).eq('id',me.id),30000);
 }
@@ -1086,7 +1150,7 @@ function renderTaskCard(t,q=''){
     <div class="task-card-header" onclick="toggleExpand('${t.id}')">
       <div class="task-info">
         <div class="task-title">${highlight(t.title,q)}</div>
-        <div class="task-meta">${pBadge(t.priority)}${sBadge(t.status||'beklemede')}${dlLabel(t.deadline)}${ta.map(e=>`<span class="badge badge-purple">@${e.split('@')[0]}</span>`).join('')}${tc.length?`<span class="badge badge-gray">💬 ${tc.length}</span>`:''}</div>
+        <div class="task-meta">${pBadge(t.priority)}${sBadge(t.status||'beklemede')}${dlLabel(t.deadline)}${ta.map(e=>`<span class="badge badge-purple">@${e}</span>`).join('')}${tc.length?`<span class="badge badge-gray">💬 ${tc.length}</span>`:''}</div>
       </div>
       <div class="task-btns">
         ${can('ai_research')?`<button class="icon-btn btn-ai" onclick="event.stopPropagation();aiResearch('${t.id}','${st}')">✦ AI</button>`:''}
@@ -1110,7 +1174,7 @@ function renderTaskCard(t,q=''){
         <div style="margin-left:16px;">
           <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Atanan</div>
           <div class="assignee-chips" style="position:relative;">
-            ${ta.map((e,i)=>`<div class="assignee-chip"><div class="assignee-chip-av">${avInitial(e)}</div>${e.split('@')[0]}${can('task_assign')?`<button class="assignee-chip-x" onclick="removeAssignee('${t.id}','${e}')">✕</button>`:''}</div>`).join('')}
+            ${ta.map((e,i)=>`<div class="assignee-chip"><div class="assignee-chip-av">${avInitial(e)}</div>${e}${can('task_assign')?`<button class="assignee-chip-x" onclick="removeAssignee('${t.id}','${e}')">✕</button>`:''}</div>`).join('')}
             ${can('task_assign')?`<div style="position:relative;">
               <button class="add-assignee-btn" onclick="toggleAssigneeDD('${t.id}')">+ Ekle</button>
               <div class="assignee-dropdown" id="add-dd-${t.id}">
@@ -1130,8 +1194,8 @@ function renderTaskCard(t,q=''){
       <!-- AÇIKLAMA -->
       <div class="task-description">
         <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Açıklama</div>
-        <div class="task-desc-text">${highlight(t.note||'<span style="color:var(--gray-300);">Not eklenmedi...</span>',q)}</div>
-        ${can('task_edit_own')||can('task_edit_all')?`<button class="icon-btn" style="font-size:11px;" onclick="editNote('${t.id}','${sn}')">✏ Düzenle</button>`:''}
+        <div class="task-desc-text" id="desc-${t.id}">${highlight(t.note||'<span style="color:var(--gray-300);">Not eklenmedi...</span>',q)}</div>
+        ${can('task_edit_own')||can('task_edit_all')?`<button class="icon-btn" style="font-size:11px;" onclick="editNote('${t.id}')">✏ Düzenle</button>`:''}
       </div>
       <!-- YORUMLAR -->
       <div class="comments-section">
@@ -1142,11 +1206,11 @@ function renderTaskCard(t,q=''){
             const isMe=c.user_id===me.id;
             const idx=profiles.findIndex(p=>p.id===c.user_id);
             return `<div class="comment-item ${isMe?'mine':''}">
-              <div class="comment-av" style="${avStyle(c.user_email,idx>=0?idx:0)}">${avInitial(c.user_email)}</div>
+              <div class="comment-av" style="${avStyle(profiles.find(p=>p.id===c.user_id)?.full_name||c.user_email,idx>=0?idx:0)}">${avInitial(profiles.find(p=>p.id===c.user_id)?.full_name||c.user_email)}</div>
               <div class="comment-body">
                 <div class="comment-bubble">${renderMentions(c.content,isMe)}</div>
                 ${c.file_url?`<div class="comment-attach"><a href="${c.file_url}" target="_blank">📎 ${c.file_name||'Dosya'}</a></div>`:''}
-                <div class="comment-meta">${isMe?'':'<b>'+c.user_email+'</b> · '}${fmtDT(c.created_at)}</div>
+                <div class="comment-meta">${isMe?'':'<b>'+(profiles.find(p=>p.id===c.user_id)?.full_name||c.user_email.split('@')[0])+'</b> · '}${fmtDT(c.created_at)}</div>
               </div>
             </div>`;
           }).join('')}
@@ -1179,8 +1243,9 @@ async function addAssigneeByProfile(taskId,profileId){
   if(!assignees[taskId].includes(displayName))assignees[taskId].push(displayName);
   const dd=document.getElementById('add-dd-'+taskId);if(dd)dd.style.display='none';
   expandedId=taskId;renderCurrentTaskView();showToast('Kişi eklendi ✓','ok');
-  const task=tasks.find(t=>t.id===taskId);
-  if(profile.email?.includes('@'))sendEmail('assigned',profile.email,task?.title||'',me.email,task?.deadline,task?.priority);
+  addNotification('assigned',`${displayName} göreve atandı`,task?.title||'Görev',taskId);
+  const task2=tasks.find(t=>t.id===taskId);
+  if(profile.email?.includes('@'))sendEmail('assigned',profile.email,task2?.title||'',me.email,task2?.deadline,task2?.priority);
 }
 
 async function removeAssignee(taskId,email){
@@ -1493,7 +1558,7 @@ function renderUsers(){
           <td style="font-size:12px;color:var(--gray-400);">${p.email||'—'}</td>
           <td>${roleObj?`<span style="background:${roleObj.color}22;color:${roleObj.color};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${roleObj.name}</span>`:'<span class="badge badge-gray">Atanmamış</span>'}</td>
           <td style="font-size:12px;">${statusIconHtml(p.status||'offline')}</td>
-          <td><div style="display:flex;gap:4px;">${can('user_manage')?`<button class="icon-btn" onclick="openAssignRoleModal('${p.id}','${(p.full_name||'').replace(/'/g,"\\'")}','${p.role_id||''}')">✏ Rol</button><button class="icon-btn" onclick="editUserInfo('${p.id}','${(p.full_name||'').replace(/'/g,"\\'")}')">✎ Düzenle</button>`:'—'}</div></td>
+          <td><div style="display:flex;gap:4px;">${can('user_manage')?`<button class="icon-btn" onclick="openAssignRoleModal('${p.id}','${(p.full_name||'').replace(/'/g,"\\'")}','${p.role_id||''}')">✏ Rol</button><button class="icon-btn" onclick="editUserInfo('${p.id}','${(p.full_name||'').replace(/'/g,"\\'")}')">✎ Düzenle</button><button class="icon-btn" style="color:var(--danger);" onclick="deleteUser('${p.id}','${(p.full_name||'').replace(/'/g,"\\'")}')">✕ Sil</button>`:'—'}</div></td>
         </tr>`;
       }).join('')}</tbody>
     </table>
@@ -1527,16 +1592,29 @@ function renderTeams(){
 }
 
 // DASHBOARD
+function checkDeadlineNotifications(){
+  const urgent=tasks.filter(t=>!t.archived&&ACTIVE.includes(t.status||'beklemede')&&dayDiff(t.deadline)<=1&&dayDiff(t.deadline)>=0);
+  urgent.forEach(t=>{
+    const key='notif-dl-'+t.id+'-'+new Date().toDateString();
+    if(!localStorage.getItem(key)){
+      addNotification('deadline',`Deadline yaklaşıyor!`,`${t.title} — ${dayDiff(t.deadline)===0?'Bugün':'Yarın'}`,t.id);
+      localStorage.setItem(key,'1');
+    }
+  });
+}
 function renderDashboard(){
-  const active=tasks.filter(t=>!t.archived&&ACTIVE.includes(t.status||'beklemede'));
-  const done=tasks.filter(t=>t.status==='tamamlandi').length;
-  const rate=tasks.length?Math.round(done/tasks.length*100):0;
+  const period=parseInt(document.getElementById('dash-period')?.value||'0');
+  const cutoff=period?new Date(Date.now()-period*86400000):null;
+  const filteredTasks=cutoff?tasks.filter(t=>new Date(t.created_at)>=cutoff):tasks;
+  const active=filteredTasks.filter(t=>!t.archived&&ACTIVE.includes(t.status||'beklemede'));
+  const done=filteredTasks.filter(t=>t.status==='tamamlandi').length;
+  const rate=filteredTasks.length?Math.round(done/filteredTasks.length*100):0;
   const urgent=active.filter(t=>dayDiff(t.deadline)<=3&&dayDiff(t.deadline)>=0).length;
   const overdue=active.filter(t=>dayDiff(t.deadline)<0).length;
   const pStats={};
-  Object.entries(assignees).forEach(([tid,names])=>{const t=tasks.find(t=>t.id===tid);if(!t)return;names.forEach(n=>{if(!pStats[n])pStats[n]={total:0,done:0};pStats[n].total++;if(t.status==='tamamlandi')pStats[n].done++;});});
+  Object.entries(assignees).forEach(([tid,names])=>{const t=filteredTasks.find(t=>t.id===tid);if(!t)return;names.forEach(n=>{if(!pStats[n])pStats[n]={total:0,done:0};pStats[n].total++;if(t.status==='tamamlandi')pStats[n].done++;});});
   const top=Object.entries(pStats).sort((a,b)=>b[1].total-a[1].total).slice(0,6);
-  const maxC=Math.max(...Object.values(STATUS_MAP).map((_,i)=>tasks.filter(t=>t.status===Object.keys(STATUS_MAP)[i]).length),1);
+  const maxC=Math.max(...Object.values(STATUS_MAP).map((_,i)=>filteredTasks.filter(t=>t.status===Object.keys(STATUS_MAP)[i]).length),1);
   document.getElementById('dashboard-content').innerHTML=`
     <div class="stat-row" style="grid-template-columns:repeat(5,minmax(0,1fr));">
       <div class="stat-card"><div class="stat-label">Aktif Görev</div><div class="stat-val">${active.length}</div></div>
@@ -1572,7 +1650,7 @@ function renderCalendar(){
       const date=new Date(calYear,calMonth,day);const isThisMonth=date.getMonth()===calMonth;if(isThisMonth)hasDay=true;
       const isToday=date.getTime()===today.getTime();const dateStr=date.toISOString().split('T')[0];
       const dt=tasks.filter(t=>t.deadline===dateStr&&ACTIVE.includes(t.status||'beklemede'));
-      html+=`<div class="cal-day ${isToday?'today':''} ${!isThisMonth?'other-month':''}"><div class="cal-day-num">${date.getDate()}</div>${dt.slice(0,2).map(t=>`<div class="cal-task-dot ${dayDiff(t.deadline)<=1?'urgent':''}">${t.title.substring(0,10)}${t.title.length>10?'...':''}</div>`).join('')}${dt.length>2?`<div style="font-size:10px;color:var(--gray-400);">+${dt.length-2}</div>`:''}</div>`;
+      html+=`<div class="cal-day ${isToday?'today':''} ${!isThisMonth?'other-month':''}"><div class="cal-day-num">${date.getDate()}</div>${dt.slice(0,2).map(t=>`<div class="cal-task-dot ${dayDiff(t.deadline)<=1?'urgent':''}" onclick="openTaskFromCal('${t.id}')" style="cursor:pointer;">${t.title.substring(0,10)}${t.title.length>10?'...':''}</div>`).join('')}${dt.length>2?`<div style="font-size:10px;color:var(--gray-400);">+${dt.length-2}</div>`:''}</div>`;
       day++;
     }
     if(!hasDay)break;
@@ -1581,6 +1659,13 @@ function renderCalendar(){
   document.getElementById('calendar-content').innerHTML=html;
 }
 function calNav(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+
+function openTaskFromCal(taskId){
+  showTaskStatus('all');
+  setTimeout(()=>{expandedId=taskId;renderCurrentTaskView();
+    setTimeout(()=>{const el=document.querySelector('.task-card.expanded');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},100);
+  },100);
+}
 
 // PROFILE
 function renderProfile(){
@@ -1663,14 +1748,14 @@ async function addComment(taskId){
     if(!error){const {data:u}=sb.storage.from('attachments').getPublicUrl(path);fileUrl=u.publicUrl;fileName=file.name;}
     delete commentFiles[taskId];const el=document.getElementById('cfile-'+taskId);if(el)el.textContent='';
   }
-  const {data,error}=await sb.from('comments').insert({task_id:taskId,user_id:me.id,user_email:me.email,content:content||'📎',file_url:fileUrl,file_name:fileName}).select().single();
+  const {data,error}=await sb.from('comments').insert({task_id:taskId,user_id:me.id,user_email:myProfile.full_name||me.email,content:content||'📎',file_url:fileUrl,file_name:fileName}).select().single();
   if(error){showToast('Yorum eklenemedi','err');return;}
   if(!comments[taskId])comments[taskId]=[];comments[taskId].push(data);
   if(inp)inp.value='';expandedId=taskId;renderCurrentTaskView();
   setTimeout(()=>{const cl=document.getElementById('clist-'+taskId);if(cl)cl.scrollTop=cl.scrollHeight;},50);
   const task=tasks.find(t=>t.id===taskId);
   const mentions=(content||'').match(/@(\S+)/g)||[];
-  for(const m of mentions){const n=m.replace('@','');const p=profiles.find(p=>(p.full_name||'').replace(/ /g,'')===n);if(p?.email?.includes('@'))sendEmail('mentioned',p.email,task?.title||'',me.email,null,null);}
+  for(const m of mentions){const n=m.replace('@','');const p=profiles.find(p=>(p.full_name||'').replace(/ /g,'')===n);if(p){addNotification('mention',`${p.full_name||p.email} etiketlendi`,task?.title||'Yorum',taskId);if(p.email?.includes('@'))sendEmail('mentioned',p.email,task?.title||'',me.email,null,null);}}
 }
 
 function handleTaskMention(e,taskId){
@@ -1771,13 +1856,70 @@ async function addTeam(){
   showToast('Ekip oluşturuldu ✓','ok');await loadTeams();showView('teams');
 }
 
+async function deleteUser(uid,name){
+  if(!can('user_manage')){showToast('Yetkiniz yok','err');return;}
+  if(!confirm(`"${name}" kullanıcısını silmek istediğine emin misin?\nBu işlem geri alınamaz.`))return;
+  const {error}=await sb.from('profiles').delete().eq('id',uid);
+  if(error){showToast('Hata: '+error.message,'err');return;}
+  showToast('Kullanıcı silindi','ok');await loadProfiles();
+}
+
 async function deleteTeam(id){if(!confirm('Ekip silinsin mi?'))return;await sb.from('teams').delete().eq('id',id);showToast('Silindi','ok');await loadTeams();}
+let notifications=[];
+function addNotification(type,title,detail,taskId){
+  const n={id:Date.now(),type,title,detail,taskId,time:new Date().toISOString(),read:false};
+  notifications.unshift(n);
+  if(notifications.length>50)notifications=notifications.slice(0,50);
+  updateNotifBadge();
+}
+function updateNotifBadge(){
+  const unread=notifications.filter(n=>!n.read).length;
+  const badge=document.getElementById('notif-badge');
+  if(badge){badge.style.display=unread>0?'inline':'none';badge.textContent=unread;}
+}
+function markAllRead(){
+  notifications.forEach(n=>n.read=true);
+  updateNotifBadge();renderNotifications();
+}
+function renderNotifications(){
+  const el=document.getElementById('notifications-list');if(!el)return;
+  if(!notifications.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔔</div>Henüz bildirim yok</div>';return;}
+  el.innerHTML=notifications.map(n=>`
+    <div style="background:#fff;border:1.5px solid ${n.read?'var(--gray-200)':'var(--accent)'};border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;cursor:${n.taskId?'pointer':'default'};" onclick="${n.taskId?`openTaskFromCal('${n.taskId}');showView('tasks');`:''}document.getElementById('notif-${n.id}')?.style.setProperty('border-color','var(--gray-200)');notifications.find(x=>x.id===${n.id}).read=true;updateNotifBadge();">
+      <div style="font-size:20px;">${n.type==='assigned'?'📋':n.type==='mention'?'@':n.type==='deadline'?'⏰':'🔔'}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:${n.read?'400':'600'};color:var(--gray-900);margin-bottom:2px;">${n.title}</div>
+        <div style="font-size:12px;color:var(--gray-400);">${n.detail} · ${fmtDT(n.time)}</div>
+      </div>
+      ${!n.read?'<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px;"></div>':''}
+    </div>`).join('');
+}
 async function deleteMeeting(id){if(!confirm('Silinsin mi?'))return;await sb.from('meetings').delete().eq('id',id);showToast('Silindi','ok');await loadMeetings();}
 
-async function editNote(id,cur){
-  const n=prompt('Notu güncelle:',cur);
-  if(n!==null){await sb.from('tasks').update({note:n}).eq('id',id);const t=tasks.find(t=>t.id===id);if(t)t.note=n;showToast('Güncellendi ✓','ok');expandedId=id;renderCurrentTaskView();}
+async function editNote(id){
+  // Mevcut notu bul
+  const task=tasks.find(t=>t.id===id);
+  if(!task)return;
+  // Inline edit alanı oluştur
+  const descDiv=document.querySelector(`#desc-${id}`);
+  if(!descDiv)return;
+  const cur=task.note||'';
+  descDiv.innerHTML=`<textarea id="note-edit-${id}" style="width:100%;padding:10px;border:1.5px solid var(--accent);border-radius:var(--radius);font-size:13px;font-family:inherit;color:var(--gray-900);resize:vertical;min-height:80px;outline:none;line-height:1.6;">${cur}</textarea>
+    <div style="display:flex;gap:6px;margin-top:6px;">
+      <button onclick="saveNote('${id}')" style="padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;">Kaydet</button>
+      <button onclick="cancelEditNote('${id}')" style="padding:6px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:12px;cursor:pointer;font-family:inherit;background:#fff;">İptal</button>
+    </div>`;
+  document.getElementById('note-edit-'+id)?.focus();
 }
+async function saveNote(id){
+  const ta=document.getElementById('note-edit-'+id);
+  if(!ta)return;
+  const n=ta.value;
+  await sb.from('tasks').update({note:n}).eq('id',id);
+  const t=tasks.find(t=>t.id===id);if(t)t.note=n;
+  showToast('Güncellendi ✓','ok');expandedId=id;renderCurrentTaskView();
+}
+function cancelEditNote(id){expandedId=id;renderCurrentTaskView();}
 
 // ROLE MANAGEMENT
 function selectColor(el){document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');selectedColor=el.dataset.color;}
@@ -1952,13 +2094,14 @@ async function aiResearch(taskId,title){
 }
 
 function showView(v){
-  ['dashboard','tasks','calendar','chat','meetings','archive','users','roles','teams','profile'].forEach(n=>{
+  ['dashboard','tasks','calendar','chat','notifications','meetings','archive','users','roles','teams','profile'].forEach(n=>{
     const el=document.getElementById('view-'+n);if(el)el.style.display=n===v?'block':'none';
     const nav=document.getElementById('nav-'+n);if(nav)nav.classList.toggle('active',n===v);
   });
   if(v==='dashboard')renderDashboard();
   if(v==='calendar')renderCalendar();
   if(v==='chat')loadChannels();
+  if(v==='notifications')renderNotifications();
   if(v==='archive')loadArchive();
   if(v==='users')loadProfiles();
   if(v==='teams')loadTeams();

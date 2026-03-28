@@ -302,7 +302,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
 .chat-mine .chat-mention-span{color:#C7D2FE;}
 /* Chat input - BÜYÜK */
 .chat-input-row{padding:16px 20px;border-top:1px solid var(--gray-200);background:#fff;display:flex;gap:10px;align-items:flex-end;position:relative;}
-.chat-input-full{flex:1;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:14px;font-size:14px;font-family:'Inter',system-ui,sans-serif;color:var(--gray-900);resize:none;max-height:120px;outline:none;line-height:1.5;min-height:48px;transition:border-color 0.15s;}
+.chat-input-full{flex:1;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:14px;font-size:14px;font-family:'Inter',system-ui,sans-serif;color:var(--gray-900);resize:none;max-height:160px;outline:none;line-height:1.5;min-height:56px;transition:border-color 0.15s;}
 .chat-input-full:focus{border-color:var(--accent);}
 .chat-send-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.15s;}
 .chat-send-btn:hover{background:var(--accent-hover);}
@@ -499,7 +499,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
         <div onclick="doLogout()" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:500;color:var(--danger);" onmouseover="this.style.background='var(--danger-light)'" onmouseout="this.style.background=''">🚪 Çıkış Yap</div>
       </div>
       <div class="team-status-section">
-        <div class="team-status-title">Ekip Durumu</div>
+        <div class="team-status-title">Ekip Durumu <span style="font-size:9px;color:var(--gray-300);font-weight:400;">(2x tıkla mesaj at)</span></div>
         <div class="team-status-list" id="team-status-list"></div>
       </div>
     </div>
@@ -668,8 +668,9 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
     </div>
     <div class="form-group" id="f-team-group" style="display:none;"><label class="form-label">Ekip</label><select class="form-input" id="f-team"><option value="">Ekip seçin...</option></select></div>
     <div class="form-group"><label class="form-label">Kişi Ata</label>
-      <input class="form-input" id="f-person-search" placeholder="İsim yazın..." oninput="filterPersonsList(this.value)" style="margin-bottom:6px;"/>
-      <div class="multi-person-select" id="f-persons-list"></div>
+      <input class="form-input" id="f-person-search" placeholder="İsim yazın..." oninput="filterPersonsList(this.value)" autocomplete="off"/>
+      <div class="multi-person-select" id="f-persons-list" style="display:none;margin-top:6px;"></div>
+      <div id="f-persons-selected" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;"></div>
     </div>
     <div class="form-group" id="f-kisi-group" style="display:none;">
       <label class="form-label">Belirli Kişiler (görünürlük)</label>
@@ -822,14 +823,18 @@ function can(p){return myPerms[p]===true;}
 function avStyle(name,idx){const i=(idx||0)%5;return `background:${AVC[i]};color:${AVT[i]}`;}
 function avInitial(s){return ((s||'?')[0]).toUpperCase();}
 
+let loginInProgress=false;
 async function init(){
   sb=supabase.createClient(SB_URL,SB_KEY);
   const {data:{session}}=await sb.auth.getSession();
   if(session){me=session.user;await afterLogin();}
   else showScreen('auth');
-  sb.auth.onAuthStateChange(async(_,s)=>{
-    if(s?.user){me=s.user;await afterLogin();}
-    else{me=null;cleanup();showScreen('auth');}
+  sb.auth.onAuthStateChange(async(event,s)=>{
+    if(event==='SIGNED_OUT'){me=null;cleanup();showScreen('auth');return;}
+    if(event==='SIGNED_IN'&&s?.user&&!loginInProgress){
+      if(document.getElementById('app-screen').style.display==='flex')return; // zaten içeride
+      me=s.user;await afterLogin();
+    }
   });
 }
 
@@ -1174,11 +1179,69 @@ function renderTeamStatus(){
   const others=profiles.filter(p=>p.id!==me?.id).slice(0,8);
   if(!others.length){el.innerHTML='<div style="font-size:11px;color:var(--gray-400);padding:2px;">Henüz kimse yok</div>';return;}
   el.innerHTML=others.map((p,i)=>`
-    <div class="ts-item">
+    <div class="ts-item" ondblclick="openQuickDM('${p.id}','${(p.full_name||p.email||'').replace(/'/g,"\\'")}')">
       <div class="ts-av" style="${avStyle(p.full_name,i)}">${avInitial(p.full_name)}</div>
       <span class="ts-name">${p.full_name||p.email||'İsimsiz'}</span>
       <div class="ts-dot ${p.status==='online'?'ts-online':p.status==='away'?'ts-away':'ts-offline'}"></div>
     </div>`).join('');
+}
+
+// MİNİ CHAT PANELİ
+let quickDMChannel=null,quickDMRt=null,quickDMMsgs=[];
+async function openQuickDM(userId,userName){
+  // Mevcut paneli kapat
+  const existing=document.getElementById('quick-dm-panel');
+  if(existing&&existing.dataset.uid===userId){existing.style.display=existing.style.display==='none'?'flex':'none';return;}
+  if(existing)existing.remove();
+  // DM kanalını bul/oluştur
+  let dmCh=channels.find(c=>{if(c.type!=='direct')return false;let m=[];try{m=JSON.parse(c.members);}catch(e){}return m.includes(me.id)&&m.includes(userId);});
+  if(!dmCh){const {data}=await sb.from('chat_channels').insert({name:userName,type:'direct',members:JSON.stringify([me.id,userId]),created_by:me.id}).select().single();dmCh=data;if(dmCh)channels.push(dmCh);}
+  if(!dmCh)return;
+  quickDMChannel=dmCh;
+  // Mesajları yükle
+  const {data}=await sb.from('chat_messages').select('*').eq('channel_id',dmCh.id).order('created_at',{ascending:true}).limit(50);
+  quickDMMsgs=data||[];
+  // Panel oluştur
+  const panel=document.createElement('div');
+  panel.id='quick-dm-panel';panel.dataset.uid=userId;
+  panel.style.cssText='position:fixed;bottom:80px;left:250px;width:300px;height:380px;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:200;display:flex;flex-direction:column;';
+  panel.innerHTML=`
+    <div style="padding:12px 14px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;background:var(--gray-50);border-radius:var(--radius-lg) var(--radius-lg) 0 0;">
+      <div style="font-size:13px;font-weight:700;">💬 ${userName}</div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="showView('chat');openDM('${userId}','${userName.replace(/'/g,"\\'")}');this.closest('#quick-dm-panel').remove()" style="font-size:11px;padding:3px 8px;border:1.5px solid var(--gray-200);border-radius:var(--radius);background:#fff;cursor:pointer;color:var(--accent);">Tam Ekran</button>
+        <button onclick="this.closest('#quick-dm-panel').style.display='none'" style="font-size:16px;background:none;border:none;cursor:pointer;color:var(--gray-400);">×</button>
+      </div>
+    </div>
+    <div id="qdm-msgs" style="flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--gray-50);"></div>
+    <div style="padding:10px 12px;border-top:1px solid var(--gray-200);display:flex;gap:6px;">
+      <input id="qdm-input" placeholder="Mesaj yaz..." style="flex:1;padding:8px 11px;border:1.5px solid var(--gray-200);border-radius:20px;font-size:13px;font-family:inherit;outline:none;" onkeydown="if(event.key==='Enter')sendQuickDM()"/>
+      <button onclick="sendQuickDM()" style="width:34px;height:34px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;">↑</button>
+    </div>`;
+  document.body.appendChild(panel);
+  renderQuickDMMsgs();
+  // Realtime
+  if(quickDMRt)sb.removeChannel(quickDMRt);
+  quickDMRt=sb.channel('qdm-'+dmCh.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},payload=>{
+      if(payload.new?.channel_id===dmCh.id){quickDMMsgs.push(payload.new);renderQuickDMMsgs();playNotifSound();}
+    }).subscribe();
+}
+function renderQuickDMMsgs(){
+  const el=document.getElementById('qdm-msgs');if(!el)return;
+  el.innerHTML=quickDMMsgs.map(m=>{
+    const isMe=m.user_id===me?.id;
+    return `<div style="display:flex;justify-content:${isMe?'flex-end':'flex-start'};">
+      <div style="max-width:80%;padding:7px 11px;border-radius:12px;font-size:13px;line-height:1.5;${isMe?'background:var(--accent);color:#fff;border-bottom-right-radius:4px;':'background:#fff;border:1.5px solid var(--gray-200);color:var(--gray-900);border-bottom-left-radius:4px;'}">${m.content}</div>
+    </div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+async function sendQuickDM(){
+  const inp=document.getElementById('qdm-input');
+  const content=inp?.value?.trim();if(!content||!quickDMChannel)return;
+  inp.value='';
+  await sb.from('chat_messages').insert({channel_id:quickDMChannel.id,user_id:me.id,user_name:myProfile.full_name||me.email,content});
 }
 
 // SOUND
@@ -1220,12 +1283,15 @@ async function selectChannel(channelId){
   document.getElementById('chat-input-area').style.display='flex';
   renderChannelList();
   if(chatRealtime)sb.removeChannel(chatRealtime);
-  chatRealtime=sb.channel('chat-msgs-'+channelId)
+  chatRealtime=sb.channel('qdm-ch-'+channelId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},payload=>{
       if(payload.new?.channel_id===channelId){
-        chatMessages.push(payload.new);
-        if(payload.new.user_id!==me?.id){playNotifSound();}
-        renderChatMessages();
+        // Duplicate kontrolü
+        if(!chatMessages.find(m=>m.id===payload.new.id)){
+          chatMessages.push(payload.new);
+          if(payload.new.user_id!==me?.id)playNotifSound();
+          renderChatMessages();
+        }
       }
     })
     .subscribe();
@@ -1589,7 +1655,7 @@ async function addTask(){
     files:'[]',archived:false
   }).select().single();
   if(error){showToast('Görev eklenemedi: '+error.message,'err');return;}
-  const sp=getSelectedPersons('f-persons-list');
+  const sp=selectedPersonIds.map(id=>profiles.find(p=>p.id===id)).filter(Boolean);
   for(const p of sp){
     const dn=p.full_name||p.id.substring(0,8);
     await sb.from('task_assignees').insert({task_id:task.id,user_email:dn});
@@ -1701,13 +1767,40 @@ function toggleProfileMenu(){
   if(m)m.style.display=m.style.display==='none'?'block':'none';
 }
 
-// KİŞİ ARAMA - atama
+// KİŞİ ARAMA - atama (görev modal)
+let selectedPersonIds=[];
 function filterPersonsList(q){
-  const items=document.querySelectorAll('#f-persons-list .person-option');
-  items.forEach(el=>{
-    const name=el.querySelector('.person-name')?.textContent?.toLowerCase()||'';
-    el.style.display=!q||name.includes(q.toLowerCase())?'':'none';
-  });
+  const list=document.getElementById('f-persons-list');
+  if(!q||q.length<1){list.style.display='none';return;}
+  const matches=profiles.filter(p=>(p.full_name||'').toLowerCase().includes(q.toLowerCase()));
+  if(!matches.length){list.style.display='none';return;}
+  list.style.display='block';
+  list.innerHTML=matches.slice(0,6).map((p,i)=>{
+    const selected=selectedPersonIds.includes(p.id);
+    return `<div class="person-option ${selected?'selected':''}" onclick="togglePersonModal('${p.id}','${(p.full_name||'').replace(/'/g,"\\'")}')">
+      <div class="person-avatar" style="${avStyle(p.full_name,i)}">${avInitial(p.full_name)}</div>
+      <span class="person-name">${p.full_name||'İsimsiz'}</span>
+      <div class="person-check ${selected?'checked':''}">${selected?'✓':''}</div>
+    </div>`;
+  }).join('');
+}
+function togglePersonModal(id,name){
+  if(selectedPersonIds.includes(id)){
+    selectedPersonIds=selectedPersonIds.filter(x=>x!==id);
+  } else {
+    selectedPersonIds.push(id);
+  }
+  renderPersonsSelected();
+  // Arama kutusunu güncelle
+  const q=document.getElementById('f-person-search')?.value||'';
+  filterPersonsList(q);
+}
+function renderPersonsSelected(){
+  const el=document.getElementById('f-persons-selected');if(!el)return;
+  el.innerHTML=selectedPersonIds.map(id=>{
+    const p=profiles.find(x=>x.id===id);if(!p)return '';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--accent-light);color:var(--accent);border-radius:20px;padding:3px 8px;font-size:12px;font-weight:500;">${p.full_name||'İsimsiz'}<button onclick="togglePersonModal('${id}','')" style="background:none;border:none;cursor:pointer;color:var(--accent);font-size:11px;padding:0;">✕</button></span>`;
+  }).join('');
 }
 
 // GÖRÜNÜRLÜK - belirli kişiler
@@ -1812,7 +1905,7 @@ function showView(v){
 function openModal(id){
   document.getElementById(id).classList.add('show');
   const today=new Date().toISOString().split('T')[0];
-  if(id==='taskModal'){document.getElementById('f-start').value=today;document.getElementById('f-deadline').value=today;document.getElementById('f-visibility').value='all';document.getElementById('f-team-group').style.display='none';document.getElementById('f-kisi-group').style.display='none';const ps=document.getElementById('f-person-search');if(ps)ps.value='';buildPersonsList('f-persons-list');}
+  if(id==='taskModal'){document.getElementById('f-start').value=today;document.getElementById('f-deadline').value=today;document.getElementById('f-visibility').value='all';document.getElementById('f-team-group').style.display='none';document.getElementById('f-kisi-group').style.display='none';const ps=document.getElementById('f-person-search');if(ps)ps.value='';const pl=document.getElementById('f-persons-list');if(pl)pl.style.display='none';selectedPersonIds=[];renderPersonsSelected();}
   if(id==='meetingModal'){document.getElementById('m-date').value=today;document.getElementById('m-participants-list').innerHTML=teams.map(t=>`<label><input type="checkbox" value="${t.name} ekibi"/> 🏷 ${t.name}</label>`).join('')+profiles.map(p=>`<label><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');}
   if(id==='teamModal')document.getElementById('team-member-checkboxes').innerHTML=profiles.map(p=>`<label><input type="checkbox" value="${p.full_name||p.id}"/> ${p.full_name||'İsimsiz'}</label>`).join('');
   if(id==='addUserModal')document.getElementById('au-role').innerHTML=roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');

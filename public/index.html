@@ -302,7 +302,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
 .chat-mine .chat-mention-span{color:#C7D2FE;}
 /* Chat input - BÜYÜK */
 .chat-input-row{padding:16px 20px;border-top:1px solid var(--gray-200);background:#fff;display:flex;gap:10px;align-items:flex-end;position:relative;}
-.chat-input-full{flex:1;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:14px;font-size:14px;font-family:'Inter',system-ui,sans-serif;color:var(--gray-900);resize:none;max-height:160px;outline:none;line-height:1.5;min-height:56px;transition:border-color 0.15s;}
+.chat-input-full{flex:1;padding:14px 18px;border:1.5px solid var(--gray-200);border-radius:14px;font-size:14px;font-family:'Inter',system-ui,sans-serif;color:var(--gray-900);resize:none;max-height:200px;outline:none;line-height:1.6;min-height:72px;transition:border-color 0.15s;}
 .chat-input-full:focus{border-color:var(--accent);}
 .chat-send-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.15s;}
 .chat-send-btn:hover{background:var(--accent-hover);}
@@ -586,7 +586,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
           <div id="chat-file-preview" style="padding:0 20px 6px;font-size:12px;color:var(--gray-400);display:none;"></div>
           <div class="chat-input-row" id="chat-input-area" style="display:none;position:relative;">
             <div style="flex:1;position:relative;">
-              <textarea class="chat-input-full" id="chat-input" placeholder="Mesaj yaz... @ ile kişi etiketle" rows="1" onkeydown="chatKeyDown(event)" onkeyup="handleChatMention(event)"></textarea>
+              <textarea class="chat-input-full" id="chat-input" placeholder="Mesaj yaz... @ ile kişi etiketle" rows="2" onkeydown="chatKeyDown(event)" onkeyup="handleChatMention(event)"></textarea>
               <div class="chat-mention-dd" id="chat-mention-dd"></div>
             </div>
             <label class="chat-file-btn"><input type="file" id="chat-file-input" style="display:none;" onchange="setChatFile(this)"/>📎</label>
@@ -677,6 +677,12 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--gra
       </select>
     </div>
     <div class="form-group" id="f-team-group" style="display:none;"><label class="form-label">Ekip</label><select class="form-input" id="f-team"><option value="">Ekip seçin...</option></select></div>
+    <div class="form-group" id="f-kisi-group" style="display:none;">
+      <label class="form-label">Görebilecek Kişiler</label>
+      <input class="form-input" id="f-kisi-search" placeholder="İsim yazarak ekle..." oninput="filterKisiList(this.value)" autocomplete="off" style="margin-bottom:6px;"/>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:5px;" id="f-kisi-selected"></div>
+      <div class="multi-person-select" id="f-kisi-list" style="display:none;max-height:120px;"></div>
+    </div>
     <div class="form-group"><label class="form-label">Not</label><textarea class="form-input" id="f-note" rows="2" placeholder="Açıklama..."></textarea></div>
     <div class="form-group">
       <label class="form-label">Dosya Ekle <span style="color:var(--gray-400);font-size:11px;">(max 10MB)</span></label>
@@ -830,8 +836,10 @@ async function init(){
   else showScreen('auth');
   sb.auth.onAuthStateChange(async(event,s)=>{
     if(event==='SIGNED_OUT'){me=null;cleanup();showScreen('auth');return;}
-    if(event==='SIGNED_IN'&&s?.user&&!loginInProgress){
-      if(document.getElementById('app-screen').style.display==='flex')return; // zaten içeride
+    // TOKEN_REFRESHED ve SIGNED_IN sadece uygulama kapalıysa işle
+    if((event==='SIGNED_IN'||event==='TOKEN_REFRESHED')&&s?.user){
+      const appOpen=document.getElementById('app-screen').style.display==='flex';
+      if(appOpen)return; // Zaten içerideyiz, refresh döngüsüne girme
       me=s.user;await afterLogin();
     }
   });
@@ -908,7 +916,10 @@ async function doChangePassword(){
 
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim(),pass=document.getElementById('l-pass').value;
-  const msg=document.getElementById('auth-msg');msg.className='auth-msg';msg.textContent='Giriş yapılıyor...';
+  const msg=document.getElementById('auth-msg');
+  if(!email||!pass){msg.className='auth-msg err';msg.textContent='E-posta ve şifre gerekli';return;}
+  if(!email.includes('@')){msg.className='auth-msg err';msg.textContent='Geçerli bir e-posta girin';return;}
+  msg.className='auth-msg';msg.textContent='Giriş yapılıyor...';
   const {error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){msg.className='auth-msg err';msg.textContent=error.message==='Invalid login credentials'?'E-posta veya şifre hatalı':error.message;}
 }
@@ -1184,7 +1195,7 @@ function renderTeamStatus(){
     return `<div class="ts-item" onclick="openQuickDM('${p.id}','${(p.full_name||p.email||'').replace(/'/g,"\\'")}')" style="cursor:pointer;">
       <div class="ts-av" style="${avStyle(p.full_name,i)};position:relative;">
         ${avInitial(p.full_name)}
-        ${hasUnread?`<div style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#EF4444;border:1.5px solid #fff;animation:pulse 1s infinite;"></div>`:''}
+        ${hasUnread?`<div style="position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:#EF4444;border:2px solid #fff;animation:pulse 1s infinite;box-shadow:0 0 6px rgba(239,68,68,0.6);"></div>`:''}
       </div>
       <span class="ts-name">${p.full_name||p.email||'İsimsiz'}</span>
       <div style="width:8px;height:8px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
@@ -1678,7 +1689,9 @@ function previewFiles(input){
 function onVisibilityChange(){
   const val=document.getElementById('f-visibility').value;
   document.getElementById('f-team-group').style.display=val==='team'?'block':'none';
-  document.getElementById('f-kisi-group').style.display=val==='kisi'?'block':'none';
+  const kg=document.getElementById('f-kisi-group');
+  if(kg)kg.style.display=val==='kisi'?'block':'none';
+  if(val!=='kisi'){selectedKisiler=[];renderKisiSelected();}
 }
 
 // ADD TASK
